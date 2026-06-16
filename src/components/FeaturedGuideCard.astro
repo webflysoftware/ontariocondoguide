@@ -1,0 +1,52 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  title: string;
+  href: string;
+  summary: string;
+  category: string;
+  image: ImageMetadata;
+  imageAlt: string;
+}
+
+const { title, href, summary, category, image, imageAlt } = Astro.props;
+---
+
+<article class="mt-10">
+  <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-700">Featured guide</p>
+  <a
+    href={href}
+    class="group mt-3 grid overflow-hidden rounded-xl border border-border bg-white shadow-sm no-underline transition hover:border-brand-200 hover:shadow-md md:grid-cols-[minmax(0,11rem)_minmax(0,1fr)] lg:grid-cols-[minmax(0,16rem)_minmax(0,1fr)]"
+  >
+    <div class="relative aspect-[16/10] overflow-hidden bg-slate-100 md:aspect-auto md:min-h-[11rem] lg:min-h-[12rem]">
+      <Image
+        src={image}
+        alt={imageAlt}
+        class="h-full w-full object-cover object-center transition duration-300 group-hover:scale-[1.02]"
+        widths={[320, 480, 640]}
+        sizes="(max-width: 768px) 100vw, 256px"
+      />
+      <div
+        class="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/25 to-transparent md:bg-gradient-to-r md:from-transparent md:to-transparent"
+      >
+      </div>
+    </div>
+    <div class="flex flex-col justify-center p-5 sm:p-6">
+      <p class="text-xs font-medium uppercase tracking-wide text-brand-700">{category}</p>
+      <h2
+        class="mt-2 text-lg font-semibold leading-snug text-slate-900 group-hover:text-brand-800 sm:text-xl"
+      >
+        {title}
+      </h2>
+      <p class="mt-2 line-clamp-3 text-sm leading-6 text-slate-600">{summary}</p>
+      <span
+        class="mt-4 inline-flex items-center text-sm font-medium text-brand-700 group-hover:text-brand-800"
+      >
+        Read guide
+        <span aria-hidden="true" class="ml-1 transition group-hover:translate-x-0.5">→</span>
+      </span>
+    </div>
+  </a>
+</article>

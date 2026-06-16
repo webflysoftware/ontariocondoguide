@@ -28,6 +28,9 @@ const guides = defineCollection({
     ctaType: z.enum(['none', 'digital-voting', 'contact']).default('none'),
     disclaimerType: z.enum(['general', 'legal']).default('general'),
     faqs: z.array(faqSchema).default([]),
+    featured: z.boolean().default(false),
+    coverImage: z.string().optional(),
+    coverImageAlt: z.string().optional(),
   }),
 });
 

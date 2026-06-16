@@ -1,11 +1,13 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import HomeHero from '../components/HomeHero.astro';
+import FeaturedGuideCard from '../components/FeaturedGuideCard.astro';
 import ArticleCard from '../components/ArticleCard.astro';
 import DisclaimerBox from '../components/DisclaimerBox.astro';
 import CTABox from '../components/CTABox.astro';
 import SearchBox from '../components/SearchBox.astro';
 import { SITE, CATEGORIES } from '../lib/site';
+import { resolveCoverImage } from '../lib/coverImages';
 import {
   contentPath,
   getPublishedGuides,
@@ -18,7 +20,13 @@ const guides = await getPublishedGuides();
 const templates = await getPublishedTemplates();
 const tools = await getPublishedTools();
 
-const featuredGuides = guides.slice(0, 2);
+const spotlightGuide = guides.find((guide) => guide.data.featured);
+const spotlightSlug = spotlightGuide ? slugFromEntry(spotlightGuide) : undefined;
+const spotlightImage = spotlightGuide ? resolveCoverImage(spotlightGuide.data.coverImage) : undefined;
+
+const featuredGuides = guides
+  .filter((guide) => slugFromEntry(guide) !== spotlightSlug)
+  .slice(0, 2);
 const featuredTemplates = templates.slice(0, 1);
 const featuredTools = tools.slice(0, 2);
 ---
@@ -28,6 +36,19 @@ const featuredTools = tools.slice(0, 2);
 
   <div class="mx-auto max-w-6xl px-4 py-10 sm:px-6">
     <SearchBox />
+
+    {
+      spotlightGuide && spotlightImage && (
+        <FeaturedGuideCard
+          title={spotlightGuide.data.title}
+          href={contentPath('guides', slugFromEntry(spotlightGuide))}
+          summary={spotlightGuide.data.summary}
+          category={spotlightGuide.data.category}
+          image={spotlightImage}
+          imageAlt={spotlightGuide.data.coverImageAlt ?? spotlightGuide.data.title}
+        />
+      )
+    }
 
     <section class="mt-12">
       <h2 class="text-2xl font-semibold">Explore by topic</h2>
