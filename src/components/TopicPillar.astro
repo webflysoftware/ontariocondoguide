@@ -1,0 +1,30 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  href: string;
+  guides?: { label: string; href: string }[];
+}
+
+const { title, description, href, guides = [] } = Astro.props;
+---
+
+<div class="rounded-xl border border-border bg-white p-6 shadow-sm">
+  <h3 class="text-lg font-semibold text-slate-900">
+    <a href={href} class="text-slate-900 no-underline hover:text-brand-800">{title}</a>
+  </h3>
+  <p class="mt-2 text-sm leading-6 text-slate-600">{description}</p>
+  {
+    guides.length > 0 && (
+      <ul class="mt-4 space-y-2 border-t border-border pt-4">
+        {guides.map((guide) => (
+          <li>
+            <a href={guide.href} class="text-sm font-medium no-underline hover:underline">
+              {guide.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</div>

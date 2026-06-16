@@ -10,7 +10,7 @@ interface Props {
 const { title, href, summary, category, meta } = Astro.props;
 ---
 
-<article class="rounded-lg border border-border bg-white p-5 shadow-sm">
+<article class="rounded-xl border border-border bg-white p-5 shadow-sm transition hover:border-brand-200 hover:shadow-md">
   <p class="text-xs font-medium uppercase tracking-wide text-brand-700">{category}</p>
   <h3 class="mt-2 text-lg">
     <a href={href} class="text-slate-900 no-underline hover:text-brand-700">{title}</a>

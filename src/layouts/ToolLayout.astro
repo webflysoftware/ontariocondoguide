@@ -3,6 +3,7 @@ import BaseLayout from './BaseLayout.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import DisclaimerBox from '../components/DisclaimerBox.astro';
 import RelatedContent from '../components/RelatedContent.astro';
+import CTABox from '../components/CTABox.astro';
 import {
   breadcrumbSchema,
   webApplicationSchema,
@@ -17,6 +18,7 @@ interface Props {
   summary: string;
   relatedGuideLinks?: { label: string; href: string }[];
   relatedTemplateLinks?: { label: string; href: string }[];
+  ctaType?: 'none' | 'digital-voting';
 }
 
 const {
@@ -27,6 +29,7 @@ const {
   summary,
   relatedGuideLinks = [],
   relatedTemplateLinks = [],
+  ctaType = 'none',
 } = Astro.props;
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -60,6 +63,19 @@ const schema = [
 
     <RelatedContent title="Related guides" items={relatedGuideLinks} />
     <RelatedContent title="Related templates" items={relatedTemplateLinks} />
+
+    {
+      ctaType === 'digital-voting' && (
+        <div class="mt-8">
+          <CTABox
+            title="Evaluating electronic voting?"
+            description="See how Ontario condo corporations can use digital voting for elections, proxies, and AGM participation."
+            href="/guides/electronic-voting-ontario-condos"
+          />
+        </div>
+      )
+    }
+
     <DisclaimerBox />
   </article>
 </BaseLayout>

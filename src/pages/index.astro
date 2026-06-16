@@ -3,22 +3,26 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import HomeHero from '../components/HomeHero.astro';
 import FeaturedGuideCard from '../components/FeaturedGuideCard.astro';
 import ArticleCard from '../components/ArticleCard.astro';
+import CategoryCard from '../components/CategoryCard.astro';
+import TopicPillar from '../components/TopicPillar.astro';
 import DisclaimerBox from '../components/DisclaimerBox.astro';
 import CTABox from '../components/CTABox.astro';
 import SearchBox from '../components/SearchBox.astro';
-import { SITE, CATEGORIES } from '../lib/site';
+import { SITE, CATEGORIES, CATEGORY_META } from '../lib/site';
 import { resolveCoverImage } from '../lib/coverImages';
 import {
   contentPath,
   getPublishedGuides,
   getPublishedTemplates,
   getPublishedTools,
+  getPublishedGlossary,
   slugFromEntry,
 } from '../lib/content';
 
 const guides = await getPublishedGuides();
 const templates = await getPublishedTemplates();
 const tools = await getPublishedTools();
+const glossary = await getPublishedGlossary();
 
 const spotlightGuide = guides.find((guide) => guide.data.featured);
 const spotlightSlug = spotlightGuide ? slugFromEntry(spotlightGuide) : undefined;
@@ -26,9 +30,47 @@ const spotlightImage = spotlightGuide ? resolveCoverImage(spotlightGuide.data.co
 
 const featuredGuides = guides
   .filter((guide) => slugFromEntry(guide) !== spotlightSlug)
-  .slice(0, 2);
-const featuredTemplates = templates.slice(0, 1);
-const featuredTools = tools.slice(0, 2);
+  .slice(0, 3);
+const featuredTemplates = templates.slice(0, 2);
+const featuredTools = tools.slice(0, 3);
+
+const categoryCounts = CATEGORIES.reduce<Record<string, number>>((acc, cat) => {
+  acc[cat] = guides.filter((g) => g.data.category === cat).length;
+  return acc;
+}, {});
+
+const pillars = [
+  {
+    title: 'AGM planning',
+    description: 'Prepare notices, agendas, quorum, and owner participation for annual general meetings.',
+    href: '/guides/ontario-condo-agm-guide',
+    guides: [
+      { label: 'Ontario Condo AGM Guide', href: '/guides/ontario-condo-agm-guide' },
+      { label: 'How to Prepare for a Condo AGM', href: '/guides/how-to-prepare-condo-agm' },
+      { label: 'AGM Checklist', href: '/templates/agm-checklist' },
+    ],
+  },
+  {
+    title: 'Board elections',
+    description: 'Run fair director elections with clear nominations, voting, and results.',
+    href: '/guides/ontario-condo-board-elections',
+    guides: [
+      { label: 'Board Election Guide', href: '/guides/ontario-condo-board-elections' },
+      { label: 'How Elections Usually Work', href: '/guides/how-condo-board-elections-work' },
+      { label: 'Election Checklist', href: '/templates/condo-election-checklist' },
+    ],
+  },
+  {
+    title: 'Proxies & quorum',
+    description: 'Track participation, manage proxy forms, and avoid quorum failures.',
+    href: '/guides/ontario-condo-quorum',
+    guides: [
+      { label: 'Quorum Guide', href: '/guides/ontario-condo-quorum' },
+      { label: 'Proxy Form Guide', href: '/guides/ontario-condo-proxy-form' },
+      { label: 'Quorum Calculator', href: '/tools/quorum-calculator' },
+    ],
+  },
+];
 ---
 
 <BaseLayout title={SITE.name} description={SITE.description} path="/">
@@ -36,6 +78,25 @@ const featuredTools = tools.slice(0, 2);
 
   <div class="mx-auto max-w-6xl px-4 py-10 sm:px-6">
     <SearchBox />
+
+    <div class="mt-8 flex flex-wrap gap-6 rounded-xl border border-border bg-slate-50 px-6 py-5 text-sm">
+      <div>
+        <span class="text-2xl font-bold text-brand-800">{guides.length}</span>
+        <span class="ml-2 text-slate-600">guides</span>
+      </div>
+      <div>
+        <span class="text-2xl font-bold text-brand-800">{templates.length}</span>
+        <span class="ml-2 text-slate-600">templates</span>
+      </div>
+      <div>
+        <span class="text-2xl font-bold text-brand-800">{tools.length}</span>
+        <span class="ml-2 text-slate-600">tools</span>
+      </div>
+      <div>
+        <span class="text-2xl font-bold text-brand-800">{glossary.length}</span>
+        <span class="ml-2 text-slate-600">glossary terms</span>
+      </div>
+    </div>
 
     {
       spotlightGuide && spotlightImage && (
@@ -52,21 +113,41 @@ const featuredTools = tools.slice(0, 2);
 
     <section class="mt-12">
       <h2 class="text-2xl font-semibold">Explore by topic</h2>
-      <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <p class="mt-2 max-w-2xl text-slate-600">
+        Browse resources organized around the governance topics Ontario condo boards, owners, and
+        managers deal with most often.
+      </p>
+      <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {
-          CATEGORIES.map((category) => (
-            <div class="rounded-lg border border-border bg-white p-4 text-sm text-slate-700">
-              {category}
-            </div>
+          CATEGORIES.filter((cat) => cat !== 'Templates & Tools').map((category) => (
+            <CategoryCard
+              title={category}
+              description={CATEGORY_META[category].description}
+              href={CATEGORY_META[category].indexPath}
+              count={categoryCounts[category]}
+            />
           ))
         }
+        <CategoryCard
+          title="Templates & Tools"
+          description={CATEGORY_META['Templates & Tools'].description}
+          href="/templates"
+          count={templates.length + tools.length}
+        />
       </div>
     </section>
 
-    <section class="mt-12 grid gap-8 lg:grid-cols-3">
+    <section class="mt-14">
+      <h2 class="text-2xl font-semibold">Start with a topic pillar</h2>
+      <div class="mt-6 grid gap-6 lg:grid-cols-3">
+        {pillars.map((pillar) => <TopicPillar {...pillar} />)}
+      </div>
+    </section>
+
+    <section class="mt-14 grid gap-8 lg:grid-cols-3">
       <div>
         <div class="mb-4 flex items-center justify-between">
-          <h2 class="text-xl font-semibold">Guides</h2>
+          <h2 class="text-xl font-semibold">Popular guides</h2>
           <a href="/guides" class="text-sm font-medium no-underline">View all</a>
         </div>
         <div class="space-y-4">
@@ -77,6 +158,7 @@ const featuredTools = tools.slice(0, 2);
                 href={contentPath('guides', slugFromEntry(guide))}
                 summary={guide.data.summary}
                 category={guide.data.category}
+                meta={`Updated ${guide.data.lastUpdated.toLocaleDateString('en-CA')}`}
               />
             ))
           }
@@ -126,7 +208,7 @@ const featuredTools = tools.slice(0, 2);
       <CTABox
         title="Planning a condo vote or AGM?"
         description="Explore digital voting resources when your corporation is evaluating electronic participation options."
-        href="/guides"
+        href="/guides/electronic-voting-ontario-condos"
       />
     </section>
 

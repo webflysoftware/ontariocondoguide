@@ -1,6 +1,7 @@
 ---
 import LandingPageLayout from '../../layouts/LandingPageLayout.astro';
 import ArticleCard from '../../components/ArticleCard.astro';
+import { CATEGORY_META, type Category } from '../../lib/site';
 import {
   contentPath,
   getPublishedGuides,
@@ -25,7 +26,7 @@ const grouped = groupByCategory(guides);
 
   {
     Object.entries(grouped).map(([category, entries]) => (
-      <section class="mt-10">
+      <section class="mt-10 scroll-mt-24" id={CATEGORY_META[category as Category]?.slug ?? category}>
         <h2 class="text-xl font-semibold">{category}</h2>
         <div class="mt-4 grid gap-4 sm:grid-cols-2">
           {entries.map((guide) => (

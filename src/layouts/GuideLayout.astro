@@ -5,6 +5,7 @@ import DisclaimerBox from '../components/DisclaimerBox.astro';
 import FAQBlock from '../components/FAQBlock.astro';
 import RelatedContent from '../components/RelatedContent.astro';
 import CTABox from '../components/CTABox.astro';
+import TableOfContents from '../components/TableOfContents.astro';
 import {
   articleSchema,
   breadcrumbSchema,
@@ -73,8 +74,21 @@ const schema = [
       Last updated {lastUpdated.toLocaleDateString('en-CA', { dateStyle: 'long' })} · {author}
     </p>
 
-    <div class="prose mt-8 max-w-none">
-      <slot />
+    <p class="mt-2 text-sm text-muted">
+      Last updated {lastUpdated.toLocaleDateString('en-CA', { dateStyle: 'long' })} · {author}
+    </p>
+
+    <div class="mt-8 lg:grid lg:grid-cols-[minmax(0,1fr)_14rem] lg:gap-10 lg:items-start">
+      <div class="prose min-w-0 max-w-none">
+        <slot />
+      </div>
+      <aside class="hidden lg:block">
+        <TableOfContents class="sticky top-24" />
+      </aside>
+    </div>
+
+    <div class="mt-8 lg:hidden">
+      <TableOfContents />
     </div>
 
     <FAQBlock faqs={faqs} />
@@ -87,7 +101,7 @@ const schema = [
         <CTABox
           title="Planning a condo vote or AGM?"
           description="Explore digital voting resources when your corporation is evaluating electronic participation options."
-          href="/guides"
+          href="/guides/electronic-voting-ontario-condos"
         />
       )
     }

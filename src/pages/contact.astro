@@ -9,8 +9,8 @@ import LandingPageLayout from '../layouts/LandingPageLayout.astro';
   heading="Contact"
 >
   <p class="max-w-2xl text-slate-700">
-    Questions about guides, templates, tools, or glossary topics? Send a message and we will get back
-    to you.
+    Questions about guides, templates, tools, or glossary topics? Send a message and we will get
+    back to you. We provide educational resources, not legal advice.
   </p>
 
   <form class="mt-8 max-w-xl space-y-4" aria-label="Contact form" id="contact-form">
@@ -21,6 +21,7 @@ import LandingPageLayout from '../layouts/LandingPageLayout.astro';
         name="name"
         type="text"
         required
+        autocomplete="name"
         class="mt-1 w-full rounded-md border border-border px-3 py-2"
       />
     </div>
@@ -31,6 +32,7 @@ import LandingPageLayout from '../layouts/LandingPageLayout.astro';
         name="email"
         type="email"
         required
+        autocomplete="email"
         class="mt-1 w-full rounded-md border border-border px-3 py-2"
       />
     </div>
@@ -41,6 +43,22 @@ import LandingPageLayout from '../layouts/LandingPageLayout.astro';
         <option>Condo owner</option>
         <option>Property manager</option>
         <option>Other</option>
+      </select>
+    </div>
+    <div>
+      <label for="condo-size" class="block text-sm font-medium text-slate-900"
+        >Condo corporation size</label
+      >
+      <select
+        id="condo-size"
+        name="condoSize"
+        class="mt-1 w-full rounded-md border border-border px-3 py-2"
+      >
+        <option>Under 50 units</option>
+        <option>50–100 units</option>
+        <option>100–250 units</option>
+        <option>250–500 units</option>
+        <option>500+ units</option>
       </select>
     </div>
     <div>
@@ -68,15 +86,37 @@ import LandingPageLayout from '../layouts/LandingPageLayout.astro';
     </div>
     <button
       type="submit"
-      class="rounded-md bg-brand-700 px-4 py-2 text-sm font-medium text-white hover:bg-brand-800"
+      class="rounded-md bg-brand-700 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-800"
     >
       Send message
     </button>
   </form>
+
+  <div
+    id="contact-thanks"
+    class="mt-8 hidden max-w-xl rounded-xl border border-brand-200 bg-brand-50 p-6"
+    role="status"
+  >
+    <h2 class="text-lg font-semibold text-brand-900">Thank you for your message</h2>
+    <p class="mt-2 text-sm leading-6 text-slate-700">
+      We have received your inquiry. While you wait, these resources may help:
+    </p>
+    <ul class="mt-4 space-y-2 text-sm">
+      <li><a href="/guides/ontario-condo-agm-guide">Ontario Condo AGM Guide</a></li>
+      <li><a href="/templates/agm-checklist">AGM Planning Checklist</a></li>
+      <li><a href="/tools/quorum-calculator">Quorum Calculator</a></li>
+      <li><a href="/guides/electronic-voting-ontario-condos">Electronic Voting Guide</a></li>
+    </ul>
+  </div>
 </LandingPageLayout>
 
 <script>
   document.getElementById('contact-form')?.addEventListener('submit', (event) => {
     event.preventDefault();
+    const form = event.target;
+    if (!(form instanceof HTMLFormElement)) return;
+
+    form.classList.add('hidden');
+    document.getElementById('contact-thanks')?.classList.remove('hidden');
   });
 </script>

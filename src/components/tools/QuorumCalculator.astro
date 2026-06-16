@@ -90,9 +90,14 @@
 
     result.innerHTML = `
       <p><strong>Required for quorum:</strong> ${required} units</p>
-      <p><strong>Current participation:</strong> ${current} units</p>
-      <p><strong>Quorum appears met:</strong> ${met ? 'Yes' : 'No'}</p>
+      <p><strong>Current participation:</strong> ${current} units (${Math.round((current / totalUnits) * 100)}% of all units)</p>
+      <p><strong>Quorum appears met:</strong> <span class="${met ? 'text-green-700' : 'text-amber-700'}">${met ? 'Yes' : 'No'}</span></p>
       <p><strong>Additional units needed:</strong> ${met ? 0 : needed}</p>
+      ${
+        !met
+          ? '<p class="mt-3 text-slate-600"><strong>Suggested next steps:</strong> Intensify proxy outreach, confirm advance/electronic voters, and review the <a href="/guides/what-happens-if-quorum-not-met">quorum failure guide</a>.</p>'
+          : '<p class="mt-3 text-slate-600"><strong>Status:</strong> Quorum appears satisfied based on current counts. Confirm all proxies and advance votes are valid before declaring the meeting open.</p>'
+      }
     `;
   }
 

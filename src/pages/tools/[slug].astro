@@ -53,6 +53,7 @@ const description = entry.data.metaDescription ?? entry.data.summary;
   summary={entry.data.summary}
   relatedGuideLinks={resolveRelatedLinks(entry.data.relatedGuides, guideIndex)}
   relatedTemplateLinks={resolveRelatedLinks(entry.data.relatedTemplates, templateIndex)}
+  ctaType={entry.data.ctaType}
 >
   <Content />
   <div slot="tool">
@@ -61,12 +62,29 @@ const description = entry.data.metaDescription ?? entry.data.summary;
       <ReadinessCheck
         title="AGM readiness"
         items={[
-          'Meeting date confirmed',
-          'Notice package drafted',
-          'Quorum requirement confirmed',
-          'Proxy process planned',
-          'Election process planned (if applicable)',
+          'Meeting date and location or virtual platform confirmed',
+          'Preliminary agenda drafted and reviewed',
+          'Notice package drafted with required content',
+          'Quorum requirement confirmed for your corporation',
+          'Proxy collection process planned and communicated',
+          'Director election process planned (if applicable)',
+          'Audited financial statements ready for presentation',
           'Virtual or electronic voting tested (if applicable)',
+        ]}
+      />
+    )}
+    {slug === 'election-readiness-check' && (
+      <ReadinessCheck
+        title="Election readiness"
+        items={[
+          'Number of open director positions confirmed',
+          'Nomination period dates set and communicated',
+          'Candidate nomination forms prepared',
+          'Voter list prepared and reviewed for accuracy',
+          'Quorum requirement known and tracked',
+          'Proxy voting rules confirmed in governing documents',
+          'Ballot format and scrutineer process defined',
+          'Electronic voting authorized and tested (if applicable)',
         ]}
       />
     )}
