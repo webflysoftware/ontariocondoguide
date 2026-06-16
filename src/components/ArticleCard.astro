@@ -1,0 +1,20 @@
+---
+interface Props {
+  title: string;
+  href: string;
+  summary: string;
+  category: string;
+  meta?: string;
+}
+
+const { title, href, summary, category, meta } = Astro.props;
+---
+
+<article class="rounded-lg border border-border bg-white p-5 shadow-sm">
+  <p class="text-xs font-medium uppercase tracking-wide text-brand-700">{category}</p>
+  <h3 class="mt-2 text-lg">
+    <a href={href} class="text-slate-900 no-underline hover:text-brand-700">{title}</a>
+  </h3>
+  <p class="mt-2 text-sm leading-6 text-slate-600">{summary}</p>
+  {meta && <p class="mt-3 text-xs text-muted">{meta}</p>}
+</article>

@@ -1,0 +1,44 @@
+---
+import LandingPageLayout from '../../layouts/LandingPageLayout.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import {
+  contentPath,
+  getPublishedGuides,
+  groupByCategory,
+  slugFromEntry,
+} from '../../lib/content';
+
+const guides = await getPublishedGuides();
+const grouped = groupByCategory(guides);
+---
+
+<LandingPageLayout
+  title="Guides"
+  description="Educational guides on Ontario condo governance, AGMs, elections, proxies, and quorum."
+  path="/guides"
+  heading="Guides"
+>
+  <p class="max-w-2xl text-lg leading-8 text-slate-700">
+    Practical overviews to help boards, owners, and managers understand common Ontario condo
+    governance processes.
+  </p>
+
+  {
+    Object.entries(grouped).map(([category, entries]) => (
+      <section class="mt-10">
+        <h2 class="text-xl font-semibold">{category}</h2>
+        <div class="mt-4 grid gap-4 sm:grid-cols-2">
+          {entries.map((guide) => (
+            <ArticleCard
+              title={guide.data.title}
+              href={contentPath('guides', slugFromEntry(guide))}
+              summary={guide.data.summary}
+              category={guide.data.category}
+              meta={`Updated ${guide.data.lastUpdated.toLocaleDateString('en-CA')}`}
+            />
+          ))}
+        </div>
+      </section>
+    ))
+  }
+</LandingPageLayout>

@@ -1,0 +1,57 @@
+---
+import { getCollection, render } from 'astro:content';
+import TemplateLayout from '../../layouts/TemplateLayout.astro';
+import {
+  contentPath,
+  getPublishedGuides,
+  getPublishedTools,
+  resolveRelatedLinks,
+  slugFromEntry,
+} from '../../lib/content';
+
+export async function getStaticPaths() {
+  const templates = await getCollection('templates');
+  return templates.map((entry) => ({
+    params: { slug: slugFromEntry(entry) },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const slug = slugFromEntry(entry);
+const path = contentPath('templates', slug);
+
+const [allGuides, allTools] = await Promise.all([
+  getPublishedGuides(),
+  getPublishedTools(),
+]);
+
+const guideIndex = allGuides.map((g) => ({
+  slug: slugFromEntry(g),
+  title: g.data.title,
+  href: contentPath('guides', slugFromEntry(g)),
+}));
+
+const toolIndex = allTools.map((t) => ({
+  slug: slugFromEntry(t),
+  title: t.data.title,
+  href: contentPath('tools', slugFromEntry(t)),
+}));
+
+const title = entry.data.metaTitle ?? entry.data.title;
+const description = entry.data.metaDescription ?? entry.data.summary;
+---
+
+<TemplateLayout
+  title={title}
+  description={description}
+  path={path}
+  category={entry.data.category}
+  summary={entry.data.summary}
+  useCase={entry.data.useCase}
+  relatedGuideLinks={resolveRelatedLinks(entry.data.relatedGuides, guideIndex)}
+  relatedToolLinks={resolveRelatedLinks(entry.data.relatedTools, toolIndex)}
+>
+  <Content />
+</TemplateLayout>

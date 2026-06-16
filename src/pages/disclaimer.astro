@@ -1,0 +1,28 @@
+---
+import LandingPageLayout from '../layouts/LandingPageLayout.astro';
+import DisclaimerBox from '../components/DisclaimerBox.astro';
+---
+
+<LandingPageLayout
+  title="Disclaimer"
+  description="General information disclaimer for Ontario Condo Guide."
+  path="/disclaimer"
+  heading="Disclaimer"
+>
+  <div class="prose max-w-2xl">
+    <p>
+      Ontario Condo Guide provides general educational information and practical resources about
+      common Ontario condominium governance topics.
+    </p>
+    <p>
+      This website is not a government website, is not affiliated with any government agency, and is
+      not a law firm. Nothing on this site is legal advice.
+    </p>
+    <p>
+      Condo corporations have unique governing documents, bylaws, and circumstances. Always confirm
+      requirements with qualified professionals and your corporation's records before making
+      decisions.
+    </p>
+  </div>
+  <DisclaimerBox />
+</LandingPageLayout>

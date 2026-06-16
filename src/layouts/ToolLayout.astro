@@ -1,0 +1,65 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import DisclaimerBox from '../components/DisclaimerBox.astro';
+import RelatedContent from '../components/RelatedContent.astro';
+import {
+  breadcrumbSchema,
+  webApplicationSchema,
+  type BreadcrumbItem,
+} from '../lib/schema';
+
+interface Props {
+  title: string;
+  description: string;
+  path: string;
+  category: string;
+  summary: string;
+  relatedGuideLinks?: { label: string; href: string }[];
+  relatedTemplateLinks?: { label: string; href: string }[];
+}
+
+const {
+  title,
+  description,
+  path,
+  category,
+  summary,
+  relatedGuideLinks = [],
+  relatedTemplateLinks = [],
+} = Astro.props;
+
+const breadcrumbs: BreadcrumbItem[] = [
+  { name: 'Home', path: '/' },
+  { name: 'Tools', path: '/tools' },
+  { name: title, path },
+];
+
+const schema = [
+  webApplicationSchema({ title, description, path }),
+  breadcrumbSchema(breadcrumbs),
+];
+---
+
+<BaseLayout title={title} description={description} path={path} schema={schema}>
+  <article class="mx-auto max-w-3xl px-4 py-10 sm:px-6" data-pagefind-body>
+    <Breadcrumbs
+      items={breadcrumbs.map((item) => ({ label: item.name, href: item.path }))}
+    />
+    <p class="text-sm font-medium text-brand-700">{category}</p>
+    <h1 class="mt-2 text-3xl font-bold sm:text-4xl">{title}</h1>
+    <p class="mt-4 text-lg leading-8 text-slate-700">{summary}</p>
+
+    <div class="prose mt-8 max-w-none">
+      <slot />
+    </div>
+
+    <div class="my-8">
+      <slot name="tool" />
+    </div>
+
+    <RelatedContent title="Related guides" items={relatedGuideLinks} />
+    <RelatedContent title="Related templates" items={relatedTemplateLinks} />
+    <DisclaimerBox />
+  </article>
+</BaseLayout>

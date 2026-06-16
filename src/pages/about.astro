@@ -1,0 +1,28 @@
+---
+import LandingPageLayout from '../layouts/LandingPageLayout.astro';
+import DisclaimerBox from '../components/DisclaimerBox.astro';
+---
+
+<LandingPageLayout
+  title="About"
+  description="About Ontario Condo Guide — an independent educational resource for Ontario condominium governance."
+  path="/about"
+  heading="About Ontario Condo Guide"
+>
+  <div class="prose max-w-2xl">
+    <p>
+      Ontario Condo Guide is an independent resource for condo boards, owners, and property managers
+      who need practical context on common Ontario condo governance processes.
+    </p>
+    <p>
+      We publish guides, templates, tools, and glossary terms focused on AGMs, board elections, proxy
+      voting, quorum, meeting notices, and related topics.
+    </p>
+    <p>
+      The site is educational in nature. It is not a government website, not a law firm, and does
+      not replace advice from qualified professionals who know your corporation's governing
+      documents.
+    </p>
+  </div>
+  <DisclaimerBox />
+</LandingPageLayout>

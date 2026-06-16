@@ -1,0 +1,43 @@
+---
+import LandingPageLayout from '../../layouts/LandingPageLayout.astro';
+import {
+  contentPath,
+  getPublishedGlossary,
+  groupByCategory,
+  slugFromEntry,
+} from '../../lib/content';
+
+const terms = await getPublishedGlossary();
+const grouped = groupByCategory(terms);
+---
+
+<LandingPageLayout
+  title="Glossary"
+  description="Plain-language definitions of common Ontario condo governance terms."
+  path="/glossary"
+  heading="Glossary"
+>
+  <p class="max-w-2xl text-lg leading-8 text-slate-700">
+    Short definitions for AGM, quorum, proxy, electronic voting, and related terms.
+  </p>
+
+  {
+    Object.entries(grouped).map(([category, entries]) => (
+      <section class="mt-10">
+        <h2 class="text-xl font-semibold">{category}</h2>
+        <dl class="mt-4 divide-y divide-border rounded-lg border border-border bg-white">
+          {entries.map((entry) => (
+            <div class="p-4">
+              <dt class="font-medium">
+                <a href={contentPath('glossary', slugFromEntry(entry))} class="no-underline">
+                  {entry.data.term}
+                </a>
+              </dt>
+              <dd class="mt-1 text-sm leading-6 text-slate-600">{entry.data.definition}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+    ))
+  }
+</LandingPageLayout>

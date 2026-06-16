@@ -1,0 +1,74 @@
+---
+import { getCollection, render } from 'astro:content';
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import QuorumCalculator from '../../components/tools/QuorumCalculator.astro';
+import ReadinessCheck from '../../components/tools/ReadinessCheck.astro';
+import {
+  contentPath,
+  getPublishedGuides,
+  getPublishedTemplates,
+  resolveRelatedLinks,
+  slugFromEntry,
+} from '../../lib/content';
+
+export async function getStaticPaths() {
+  const tools = await getCollection('tools');
+  return tools.map((entry) => ({
+    params: { slug: slugFromEntry(entry) },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const slug = slugFromEntry(entry);
+const path = contentPath('tools', slug);
+
+const [allGuides, allTemplates] = await Promise.all([
+  getPublishedGuides(),
+  getPublishedTemplates(),
+]);
+
+const guideIndex = allGuides.map((g) => ({
+  slug: slugFromEntry(g),
+  title: g.data.title,
+  href: contentPath('guides', slugFromEntry(g)),
+}));
+
+const templateIndex = allTemplates.map((t) => ({
+  slug: slugFromEntry(t),
+  title: t.data.title,
+  href: contentPath('templates', slugFromEntry(t)),
+}));
+
+const title = entry.data.metaTitle ?? entry.data.title;
+const description = entry.data.metaDescription ?? entry.data.summary;
+---
+
+<ToolLayout
+  title={title}
+  description={description}
+  path={path}
+  category={entry.data.category}
+  summary={entry.data.summary}
+  relatedGuideLinks={resolveRelatedLinks(entry.data.relatedGuides, guideIndex)}
+  relatedTemplateLinks={resolveRelatedLinks(entry.data.relatedTemplates, templateIndex)}
+>
+  <Content />
+  <div slot="tool">
+    {slug === 'quorum-calculator' && <QuorumCalculator />}
+    {slug === 'agm-readiness-check' && (
+      <ReadinessCheck
+        title="AGM readiness"
+        items={[
+          'Meeting date confirmed',
+          'Notice package drafted',
+          'Quorum requirement confirmed',
+          'Proxy process planned',
+          'Election process planned (if applicable)',
+          'Virtual or electronic voting tested (if applicable)',
+        ]}
+      />
+    )}
+  </div>
+</ToolLayout>

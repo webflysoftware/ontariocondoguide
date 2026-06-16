@@ -1,0 +1,102 @@
+<div class="rounded-lg border border-border bg-white p-6" id="quorum-calculator">
+  <form class="grid gap-4 sm:grid-cols-2" id="quorum-form">
+    <div>
+      <label for="total-units" class="block text-sm font-medium">Total eligible voting units</label>
+      <input
+        id="total-units"
+        name="totalUnits"
+        type="number"
+        min="1"
+        value="100"
+        class="mt-1 w-full rounded-md border border-border px-3 py-2"
+      />
+    </div>
+    <div>
+      <label for="quorum-percent" class="block text-sm font-medium">Required quorum (%)</label>
+      <input
+        id="quorum-percent"
+        name="quorumPercent"
+        type="number"
+        min="1"
+        max="100"
+        value="25"
+        class="mt-1 w-full rounded-md border border-border px-3 py-2"
+      />
+    </div>
+    <div>
+      <label for="attendees" class="block text-sm font-medium">Confirmed attendees</label>
+      <input
+        id="attendees"
+        name="attendees"
+        type="number"
+        min="0"
+        value="10"
+        class="mt-1 w-full rounded-md border border-border px-3 py-2"
+      />
+    </div>
+    <div>
+      <label for="proxies" class="block text-sm font-medium">Valid proxies</label>
+      <input
+        id="proxies"
+        name="proxies"
+        type="number"
+        min="0"
+        value="12"
+        class="mt-1 w-full rounded-md border border-border px-3 py-2"
+      />
+    </div>
+    <div class="sm:col-span-2">
+      <label for="advance-voters" class="block text-sm font-medium"
+        >Advance / electronic voters (optional)</label
+      >
+      <input
+        id="advance-voters"
+        name="advanceVoters"
+        type="number"
+        min="0"
+        value="0"
+        class="mt-1 w-full rounded-md border border-border px-3 py-2"
+      />
+    </div>
+  </form>
+
+  <div class="mt-6 rounded-lg bg-slate-50 p-4 text-sm leading-6" id="quorum-result" aria-live="polite">
+    Enter values to calculate quorum.
+  </div>
+</div>
+
+<script>
+  function calculateQuorum() {
+    const form = document.getElementById('quorum-form');
+    const result = document.getElementById('quorum-result');
+    if (!(form instanceof HTMLFormElement) || !result) return;
+
+    const data = new FormData(form);
+    const totalUnits = Number(data.get('totalUnits')) || 0;
+    const quorumPercent = Number(data.get('quorumPercent')) || 0;
+    const attendees = Number(data.get('attendees')) || 0;
+    const proxies = Number(data.get('proxies')) || 0;
+    const advanceVoters = Number(data.get('advanceVoters')) || 0;
+
+    if (totalUnits <= 0 || quorumPercent <= 0) {
+      result.textContent = 'Enter valid total units and quorum percentage.';
+      return;
+    }
+
+    const required = Math.ceil(totalUnits * (quorumPercent / 100));
+    const current = attendees + proxies + advanceVoters;
+    const met = current >= required;
+    const needed = Math.max(required - current, 0);
+
+    result.innerHTML = `
+      <p><strong>Required for quorum:</strong> ${required} units</p>
+      <p><strong>Current participation:</strong> ${current} units</p>
+      <p><strong>Quorum appears met:</strong> ${met ? 'Yes' : 'No'}</p>
+      <p><strong>Additional units needed:</strong> ${met ? 0 : needed}</p>
+    `;
+  }
+
+  const form = document.getElementById('quorum-form');
+  form?.addEventListener('input', calculateQuorum);
+  calculateQuorum();
+</script>

@@ -1,0 +1,42 @@
+---
+import { getCollection, render } from 'astro:content';
+import GlossaryLayout from '../../layouts/GlossaryLayout.astro';
+import {
+  contentPath,
+  getPublishedGuides,
+  resolveRelatedLinks,
+  slugFromEntry,
+} from '../../lib/content';
+
+export async function getStaticPaths() {
+  const glossary = await getCollection('glossary');
+  return glossary.map((entry) => ({
+    params: { slug: slugFromEntry(entry) },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const slug = slugFromEntry(entry);
+const path = contentPath('glossary', slug);
+
+const allGuides = await getPublishedGuides();
+const guideIndex = allGuides.map((g) => ({
+  slug: slugFromEntry(g),
+  title: g.data.title,
+  href: contentPath('guides', slugFromEntry(g)),
+}));
+---
+
+<GlossaryLayout
+  title={entry.data.title}
+  description={entry.data.summary}
+  path={path}
+  term={entry.data.term}
+  definition={entry.data.definition}
+  category={entry.data.category}
+  relatedGuideLinks={resolveRelatedLinks(entry.data.relatedGuides, guideIndex)}
+>
+  <Content />
+</GlossaryLayout>

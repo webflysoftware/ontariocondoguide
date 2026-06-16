@@ -1,0 +1,106 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import DisclaimerBox from '../components/DisclaimerBox.astro';
+import FAQBlock from '../components/FAQBlock.astro';
+import RelatedContent from '../components/RelatedContent.astro';
+import CTABox from '../components/CTABox.astro';
+import {
+  articleSchema,
+  breadcrumbSchema,
+  faqPageSchema,
+  type BreadcrumbItem,
+} from '../lib/schema';
+
+interface Props {
+  title: string;
+  description: string;
+  path: string;
+  category: string;
+  summary: string;
+  lastUpdated: Date;
+  author: string;
+  faqs?: { question: string; answer: string }[];
+  relatedGuideLinks?: { label: string; href: string }[];
+  relatedTemplateLinks?: { label: string; href: string }[];
+  relatedToolLinks?: { label: string; href: string }[];
+  ctaType?: 'none' | 'digital-voting' | 'contact';
+}
+
+const {
+  title,
+  description,
+  path,
+  category,
+  summary,
+  lastUpdated,
+  author,
+  faqs = [],
+  relatedGuideLinks = [],
+  relatedTemplateLinks = [],
+  relatedToolLinks = [],
+  ctaType = 'none',
+} = Astro.props;
+
+const breadcrumbs: BreadcrumbItem[] = [
+  { name: 'Home', path: '/' },
+  { name: 'Guides', path: '/guides' },
+  { name: title, path },
+];
+
+const schema = [
+  articleSchema({
+    title,
+    description,
+    path,
+    dateModified: lastUpdated.toISOString().split('T')[0],
+    author,
+  }),
+  breadcrumbSchema(breadcrumbs),
+  faqPageSchema(faqs),
+].filter(Boolean);
+---
+
+<BaseLayout title={title} description={description} path={path} ogType="article" schema={schema}>
+  <article class="mx-auto max-w-3xl px-4 py-10 sm:px-6" data-pagefind-body>
+    <Breadcrumbs
+      items={breadcrumbs.map((item) => ({ label: item.name, href: item.path }))}
+    />
+    <p class="text-sm font-medium text-brand-700">{category}</p>
+    <h1 class="mt-2 text-3xl font-bold sm:text-4xl">{title}</h1>
+    <p class="mt-4 text-lg leading-8 text-slate-700">{summary}</p>
+    <p class="mt-2 text-sm text-muted">
+      Last updated {lastUpdated.toLocaleDateString('en-CA', { dateStyle: 'long' })} · {author}
+    </p>
+
+    <div class="prose mt-8 max-w-none">
+      <slot />
+    </div>
+
+    <FAQBlock faqs={faqs} />
+    <RelatedContent title="Related guides" items={relatedGuideLinks} />
+    <RelatedContent title="Related templates" items={relatedTemplateLinks} />
+    <RelatedContent title="Related tools" items={relatedToolLinks} />
+
+    {
+      ctaType === 'digital-voting' && (
+        <CTABox
+          title="Planning a condo vote or AGM?"
+          description="Explore digital voting resources when your corporation is evaluating electronic participation options."
+          href="/guides"
+        />
+      )
+    }
+    {
+      ctaType === 'contact' && (
+        <CTABox
+          title="Have a question?"
+          description="Send us a note through the contact page. We provide educational resources, not legal advice."
+          href="/contact"
+        />
+      )
+    }
+
+    <DisclaimerBox />
+  </article>
+</BaseLayout>

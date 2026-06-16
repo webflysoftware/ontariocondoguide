@@ -1,0 +1,114 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HomeHero from '../components/HomeHero.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import DisclaimerBox from '../components/DisclaimerBox.astro';
+import CTABox from '../components/CTABox.astro';
+import SearchBox from '../components/SearchBox.astro';
+import { SITE, CATEGORIES } from '../lib/site';
+import {
+  contentPath,
+  getPublishedGuides,
+  getPublishedTemplates,
+  getPublishedTools,
+  slugFromEntry,
+} from '../lib/content';
+
+const guides = await getPublishedGuides();
+const templates = await getPublishedTemplates();
+const tools = await getPublishedTools();
+
+const featuredGuides = guides.slice(0, 2);
+const featuredTemplates = templates.slice(0, 1);
+const featuredTools = tools.slice(0, 2);
+---
+
+<BaseLayout title={SITE.name} description={SITE.description} path="/">
+  <HomeHero />
+
+  <div class="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+    <SearchBox />
+
+    <section class="mt-12">
+      <h2 class="text-2xl font-semibold">Explore by topic</h2>
+      <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {
+          CATEGORIES.map((category) => (
+            <div class="rounded-lg border border-border bg-white p-4 text-sm text-slate-700">
+              {category}
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="mt-12 grid gap-8 lg:grid-cols-3">
+      <div>
+        <div class="mb-4 flex items-center justify-between">
+          <h2 class="text-xl font-semibold">Guides</h2>
+          <a href="/guides" class="text-sm font-medium no-underline">View all</a>
+        </div>
+        <div class="space-y-4">
+          {
+            featuredGuides.map((guide) => (
+              <ArticleCard
+                title={guide.data.title}
+                href={contentPath('guides', slugFromEntry(guide))}
+                summary={guide.data.summary}
+                category={guide.data.category}
+              />
+            ))
+          }
+        </div>
+      </div>
+
+      <div>
+        <div class="mb-4 flex items-center justify-between">
+          <h2 class="text-xl font-semibold">Templates</h2>
+          <a href="/templates" class="text-sm font-medium no-underline">View all</a>
+        </div>
+        <div class="space-y-4">
+          {
+            featuredTemplates.map((template) => (
+              <ArticleCard
+                title={template.data.title}
+                href={contentPath('templates', slugFromEntry(template))}
+                summary={template.data.summary}
+                category={template.data.category}
+              />
+            ))
+          }
+        </div>
+      </div>
+
+      <div>
+        <div class="mb-4 flex items-center justify-between">
+          <h2 class="text-xl font-semibold">Tools</h2>
+          <a href="/tools" class="text-sm font-medium no-underline">View all</a>
+        </div>
+        <div class="space-y-4">
+          {
+            featuredTools.map((tool) => (
+              <ArticleCard
+                title={tool.data.title}
+                href={contentPath('tools', slugFromEntry(tool))}
+                summary={tool.data.summary}
+                category={tool.data.category}
+              />
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="mt-12">
+      <CTABox
+        title="Planning a condo vote or AGM?"
+        description="Explore digital voting resources when your corporation is evaluating electronic participation options."
+        href="/guides"
+      />
+    </section>
+
+    <DisclaimerBox />
+  </div>
+</BaseLayout>

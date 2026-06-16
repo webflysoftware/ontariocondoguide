@@ -1,0 +1,19 @@
+---
+---
+
+<div class="my-8 rounded-lg border border-dashed border-border bg-slate-50 p-6">
+  <label for="site-search" class="block text-sm font-medium text-slate-900">Search</label>
+  <input
+    id="site-search"
+    type="search"
+    placeholder="Search guides, templates, tools, and glossary…"
+    class="mt-2 w-full rounded-md border border-border px-3 py-2 text-sm"
+    disabled
+  />
+  <p class="mt-2 text-xs text-muted">
+    Site search is powered by Pagefind after build. Run <code class="text-xs">npm run build</code> to generate the index.
+  </p>
+</div>
+
+<!-- Pagefind UI mounts here when integrated on the search page -->
+<div id="search" class="hidden" data-pagefind-ui></div>

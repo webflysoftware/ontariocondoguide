@@ -1,0 +1,57 @@
+---
+interface Props {
+  title: string;
+  items: string[];
+}
+
+const { title, items } = Astro.props;
+---
+
+<div class="rounded-lg border border-border bg-white p-6" data-readiness-check>
+  <h2 class="text-lg font-semibold">{title}</h2>
+  <fieldset class="mt-4 space-y-3">
+    <legend class="sr-only">{title} checklist</legend>
+    {
+      items.map((item, index) => (
+        <label class="flex items-start gap-3 text-sm">
+          <input type="checkbox" data-check-item class="mt-1" value={item} />
+          <span>{item}</span>
+        </label>
+      ))
+    }
+  </fieldset>
+  <div class="mt-6 rounded-lg bg-slate-50 p-4 text-sm leading-6" data-readiness-result aria-live="polite">
+    Check items above to see your readiness summary.
+  </div>
+</div>
+
+<script>
+  function updateReadiness(root: HTMLElement) {
+    const boxes = root.querySelectorAll<HTMLInputElement>('[data-check-item]');
+    const result = root.querySelector('[data-readiness-result]');
+    if (!result) return;
+
+    const total = boxes.length;
+    const checked = Array.from(boxes).filter((box) => box.checked);
+    const missing = Array.from(boxes)
+      .filter((box) => !box.checked)
+      .map((box) => box.value);
+
+    const score = total === 0 ? 0 : Math.round((checked.length / total) * 100);
+
+    result.innerHTML = `
+      <p><strong>Readiness score:</strong> ${score}%</p>
+      <p><strong>Completed:</strong> ${checked.length} of ${total}</p>
+      ${
+        missing.length > 0
+          ? `<p><strong>Missing items:</strong> ${missing.join('; ')}</p>`
+          : '<p><strong>Status:</strong> All listed items checked.</p>'
+      }
+    `;
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-readiness-check]').forEach((root) => {
+    root.addEventListener('change', () => updateReadiness(root));
+    updateReadiness(root);
+  });
+</script>

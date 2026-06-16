@@ -1,0 +1,71 @@
+---
+import { getCollection, render } from 'astro:content';
+import GuideLayout from '../../layouts/GuideLayout.astro';
+import {
+  contentPath,
+  getPublishedGuides,
+  getPublishedTemplates,
+  getPublishedTools,
+  resolveRelatedLinks,
+  slugFromEntry,
+} from '../../lib/content';
+
+export async function getStaticPaths() {
+  const guides = await getCollection('guides');
+  return guides.map((entry) => ({
+    params: { slug: slugFromEntry(entry) },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const slug = slugFromEntry(entry);
+const path = contentPath('guides', slug);
+
+const [allGuides, allTemplates, allTools] = await Promise.all([
+  getPublishedGuides(),
+  getPublishedTemplates(),
+  getPublishedTools(),
+]);
+
+const guideIndex = allGuides
+  .filter((g) => slugFromEntry(g) !== slug)
+  .map((g) => ({
+    slug: slugFromEntry(g),
+    title: g.data.title,
+    href: contentPath('guides', slugFromEntry(g)),
+  }));
+
+const templateIndex = allTemplates.map((t) => ({
+  slug: slugFromEntry(t),
+  title: t.data.title,
+  href: contentPath('templates', slugFromEntry(t)),
+}));
+
+const toolIndex = allTools.map((t) => ({
+  slug: slugFromEntry(t),
+  title: t.data.title,
+  href: contentPath('tools', slugFromEntry(t)),
+}));
+
+const title = entry.data.metaTitle ?? entry.data.title;
+const description = entry.data.metaDescription ?? entry.data.summary;
+---
+
+<GuideLayout
+  title={title}
+  description={description}
+  path={path}
+  category={entry.data.category}
+  summary={entry.data.summary}
+  lastUpdated={entry.data.lastUpdated}
+  author={entry.data.author}
+  faqs={entry.data.faqs}
+  ctaType={entry.data.ctaType}
+  relatedGuideLinks={resolveRelatedLinks(entry.data.relatedGuides, guideIndex)}
+  relatedTemplateLinks={resolveRelatedLinks(entry.data.relatedTemplates, templateIndex)}
+  relatedToolLinks={resolveRelatedLinks(entry.data.relatedTools, toolIndex)}
+>
+  <Content />
+</GuideLayout>

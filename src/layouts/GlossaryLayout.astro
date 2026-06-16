@@ -1,0 +1,51 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import RelatedContent from '../components/RelatedContent.astro';
+import { breadcrumbSchema, type BreadcrumbItem } from '../lib/schema';
+
+interface Props {
+  title: string;
+  description: string;
+  path: string;
+  term: string;
+  definition: string;
+  category: string;
+  relatedGuideLinks?: { label: string; href: string }[];
+}
+
+const {
+  title,
+  description,
+  path,
+  term,
+  definition,
+  category,
+  relatedGuideLinks = [],
+} = Astro.props;
+
+const breadcrumbs: BreadcrumbItem[] = [
+  { name: 'Home', path: '/' },
+  { name: 'Glossary', path: '/glossary' },
+  { name: term, path },
+];
+
+const schema = [breadcrumbSchema(breadcrumbs)];
+---
+
+<BaseLayout title={title} description={description} path={path} schema={schema}>
+  <article class="mx-auto max-w-3xl px-4 py-10 sm:px-6" data-pagefind-body>
+    <Breadcrumbs
+      items={breadcrumbs.map((item) => ({ label: item.name, href: item.path }))}
+    />
+    <p class="text-sm font-medium text-brand-700">{category}</p>
+    <h1 class="mt-2 text-3xl font-bold sm:text-4xl">{term}</h1>
+    <p class="mt-4 text-lg leading-8 text-slate-800">{definition}</p>
+
+    <div class="prose mt-8 max-w-none">
+      <slot />
+    </div>
+
+    <RelatedContent title="Related guides" items={relatedGuideLinks} />
+  </article>
+</BaseLayout>

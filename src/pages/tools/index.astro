@@ -1,0 +1,43 @@
+---
+import LandingPageLayout from '../../layouts/LandingPageLayout.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import {
+  contentPath,
+  getPublishedTools,
+  groupByCategory,
+  slugFromEntry,
+} from '../../lib/content';
+
+const tools = await getPublishedTools();
+const grouped = groupByCategory(tools);
+---
+
+<LandingPageLayout
+  title="Tools"
+  description="Lightweight calculators and readiness checks for Ontario condo meetings."
+  path="/tools"
+  heading="Tools"
+>
+  <p class="max-w-2xl text-lg leading-8 text-slate-700">
+    Simple planning tools for quorum estimates and meeting readiness. More tools will be added over
+    time.
+  </p>
+
+  {
+    Object.entries(grouped).map(([category, entries]) => (
+      <section class="mt-10">
+        <h2 class="text-xl font-semibold">{category}</h2>
+        <div class="mt-4 grid gap-4 sm:grid-cols-2">
+          {entries.map((tool) => (
+            <ArticleCard
+              title={tool.data.title}
+              href={contentPath('tools', slugFromEntry(tool))}
+              summary={tool.data.summary}
+              category={tool.data.category}
+            />
+          ))}
+        </div>
+      </section>
+    ))
+  }
+</LandingPageLayout>

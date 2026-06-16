@@ -1,0 +1,76 @@
+---
+import LandingPageLayout from '../layouts/LandingPageLayout.astro';
+---
+
+<LandingPageLayout
+  title="Contact"
+  description="Contact Ontario Condo Guide with questions about condo governance resources."
+  path="/contact"
+  heading="Contact"
+>
+  <p class="max-w-2xl text-slate-700">
+    This form is a placeholder for MVP. Submissions are not processed yet.
+  </p>
+
+  <form class="mt-8 max-w-xl space-y-4" aria-label="Contact form">
+    <div>
+      <label for="name" class="block text-sm font-medium text-slate-900">Name</label>
+      <input
+        id="name"
+        name="name"
+        type="text"
+        class="mt-1 w-full rounded-md border border-border px-3 py-2"
+        disabled
+      />
+    </div>
+    <div>
+      <label for="email" class="block text-sm font-medium text-slate-900">Email</label>
+      <input
+        id="email"
+        name="email"
+        type="email"
+        class="mt-1 w-full rounded-md border border-border px-3 py-2"
+        disabled
+      />
+    </div>
+    <div>
+      <label for="role" class="block text-sm font-medium text-slate-900">Role</label>
+      <select id="role" name="role" class="mt-1 w-full rounded-md border border-border px-3 py-2" disabled>
+        <option>Board director</option>
+        <option>Condo owner</option>
+        <option>Property manager</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div>
+      <label for="topic" class="block text-sm font-medium text-slate-900">Topic</label>
+      <select id="topic" name="topic" class="mt-1 w-full rounded-md border border-border px-3 py-2" disabled>
+        <option>AGM</option>
+        <option>Election</option>
+        <option>Proxy</option>
+        <option>Quorum</option>
+        <option>Electronic voting</option>
+        <option>Board meeting</option>
+        <option>Owner meeting</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div>
+      <label for="message" class="block text-sm font-medium text-slate-900">Message</label>
+      <textarea
+        id="message"
+        name="message"
+        rows="5"
+        class="mt-1 w-full rounded-md border border-border px-3 py-2"
+        disabled
+      />
+    </div>
+    <button
+      type="button"
+      class="rounded-md bg-brand-700 px-4 py-2 text-sm font-medium text-white opacity-60"
+      disabled
+    >
+      Send message (coming soon)
+    </button>
+  </form>
+</LandingPageLayout>

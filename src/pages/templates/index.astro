@@ -1,0 +1,42 @@
+---
+import LandingPageLayout from '../../layouts/LandingPageLayout.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import {
+  contentPath,
+  getPublishedTemplates,
+  groupByCategory,
+  slugFromEntry,
+} from '../../lib/content';
+
+const templates = await getPublishedTemplates();
+const grouped = groupByCategory(templates);
+---
+
+<LandingPageLayout
+  title="Templates"
+  description="Checklists and meeting templates for Ontario condo boards and managers."
+  path="/templates"
+  heading="Templates"
+>
+  <p class="max-w-2xl text-lg leading-8 text-slate-700">
+    Downloadable-style checklists and planning templates for AGMs, elections, and proxy collection.
+  </p>
+
+  {
+    Object.entries(grouped).map(([category, entries]) => (
+      <section class="mt-10">
+        <h2 class="text-xl font-semibold">{category}</h2>
+        <div class="mt-4 grid gap-4 sm:grid-cols-2">
+          {entries.map((template) => (
+            <ArticleCard
+              title={template.data.title}
+              href={contentPath('templates', slugFromEntry(template))}
+              summary={template.data.summary}
+              category={template.data.category}
+            />
+          ))}
+        </div>
+      </section>
+    ))
+  }
+</LandingPageLayout>
