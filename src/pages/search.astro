@@ -1,0 +1,31 @@
+---
+import LandingPageLayout from '../layouts/LandingPageLayout.astro';
+---
+
+<LandingPageLayout
+  title="Search"
+  description="Search Ontario Condo Guide guides, templates, tools, and glossary terms."
+  path="/search"
+  heading="Search"
+>
+  <p class="max-w-2xl text-slate-700">
+    Find guides, templates, tools, and glossary entries across the site.
+  </p>
+
+  <link rel="stylesheet" href="/pagefind/pagefind-ui.css" />
+  <div id="search" class="mt-8"></div>
+</LandingPageLayout>
+
+<script>
+  import { PagefindUI } from '@pagefind/default-ui';
+
+  const ui = new PagefindUI({
+    element: '#search',
+    showSubResults: true,
+  });
+
+  const query = new URLSearchParams(window.location.search).get('q');
+  if (query) {
+    ui.triggerSearch(query);
+  }
+</script>

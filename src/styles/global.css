@@ -52,4 +52,16 @@
   .prose li {
     @apply leading-7;
   }
+
+  .prose table {
+    @apply my-6 w-full border-collapse text-sm;
+  }
+
+  .prose th {
+    @apply border border-border bg-slate-50 px-3 py-2 text-left font-semibold text-slate-900;
+  }
+
+  .prose td {
+    @apply border border-border px-3 py-2 text-slate-700;
+  }
 }

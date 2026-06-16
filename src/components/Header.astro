@@ -1,19 +1,56 @@
 ---
+import { Image } from 'astro:assets';
+import logo from '../assets/images/ontario-condo-guide-logo-mark.png';
 import { NAV_LINKS, SITE } from '../lib/site';
+
+const currentPath = Astro.url.pathname;
+
+function isActive(href: string): boolean {
+  if (href === '/') return currentPath === '/';
+  return currentPath === href || currentPath.startsWith(`${href}/`);
+}
 ---
 
-<header class="border-b border-border bg-white">
-  <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6">
-    <a href="/" class="no-underline">
-      <span class="block text-lg font-semibold text-slate-900">{SITE.name}</span>
-      <span class="block text-sm text-muted">{SITE.tagline}</span>
+<header class="sticky top-0 z-50 border-b border-slate-200/90 bg-white/95 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/90">
+  <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-2.5 sm:px-6 sm:py-3">
+    <a
+      href="/"
+      class="group flex min-w-0 items-center gap-3 no-underline sm:gap-3.5"
+      aria-label={`${SITE.name} home`}
+    >
+      <Image
+        src={logo}
+        alt=""
+        aria-hidden="true"
+        class="h-9 w-auto shrink-0 sm:h-10 md:h-11"
+        widths={[280, 420, 560]}
+        sizes="(max-width: 640px) 160px, 200px"
+        loading="eager"
+        decoding="async"
+      />
+      <span class="hidden min-w-0 border-l border-slate-200 pl-3 sm:block">
+        <span class="block truncate text-sm font-semibold leading-tight text-slate-900 group-hover:text-brand-800">
+          {SITE.name}
+        </span>
+        <span class="mt-0.5 block truncate text-xs leading-snug text-muted">{SITE.tagline}</span>
+      </span>
     </a>
-    <nav aria-label="Main navigation">
-      <ul class="flex flex-wrap gap-x-4 gap-y-2 text-sm font-medium">
+
+    <nav aria-label="Main navigation" class="hidden items-center md:flex">
+      <ul class="flex items-center gap-0.5">
         {
           NAV_LINKS.map((link) => (
             <li>
-              <a href={link.href} class="text-slate-700 no-underline hover:text-brand-700">
+              <a
+                href={link.href}
+                class:list={[
+                  'rounded-md px-3 py-2 text-sm font-medium no-underline transition',
+                  isActive(link.href)
+                    ? 'bg-brand-50 text-brand-800'
+                    : 'text-slate-600 hover:bg-brand-50 hover:text-brand-800',
+                ]}
+                aria-current={isActive(link.href) ? 'page' : undefined}
+              >
                 {link.label}
               </a>
             </li>
@@ -21,5 +58,48 @@ import { NAV_LINKS, SITE } from '../lib/site';
         }
       </ul>
     </nav>
+
+    <details class="relative md:hidden">
+      <summary
+        class="flex cursor-pointer list-none items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 marker:content-none hover:border-slate-300 hover:bg-slate-50"
+      >
+        <span aria-hidden="true" class="flex flex-col gap-1">
+          <span class="block h-0.5 w-4 rounded-full bg-current" />
+          <span class="block h-0.5 w-4 rounded-full bg-current" />
+          <span class="block h-0.5 w-4 rounded-full bg-current" />
+        </span>
+        Menu
+      </summary>
+      <div
+        class="absolute right-0 z-50 mt-2 w-52 rounded-lg border border-slate-200 bg-white py-2 shadow-lg"
+      >
+        <ul>
+          {
+            NAV_LINKS.map((link) => (
+              <li>
+                <a
+                  href={link.href}
+                  class:list={[
+                    'block px-4 py-2.5 text-sm font-medium no-underline',
+                    isActive(link.href)
+                      ? 'bg-brand-50 text-brand-800'
+                      : 'text-slate-700 hover:bg-brand-50 hover:text-brand-800',
+                  ]}
+                  aria-current={isActive(link.href) ? 'page' : undefined}
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </details>
   </div>
 </header>
+
+<style>
+  details > summary::-webkit-details-marker {
+    display: none;
+  }
+</style>

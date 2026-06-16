@@ -1,4 +1,5 @@
 Initialize a fully working Astro website for “Ontario Condo Guide”.
+To be served at ontariocondoguide.ca
 
 Project Goal:
 Build a static-first, SEO-optimized, fast-loading resource website for Ontario condo boards, condo owners, property managers, and condo corporations. The website should feel like a practical independent authority on Ontario condo governance topics such as AGMs, owners’ meetings, board elections, proxy voting, quorum, electronic voting, board duties, meeting notices, checklists, and templates.
