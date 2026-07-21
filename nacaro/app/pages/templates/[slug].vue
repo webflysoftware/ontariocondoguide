@@ -1,6 +1,6 @@
-<script setup lang="ts">
+<script setup>
 const route = useRoute();
-const slug = route.params.slug as string;
+const slug = route.params.slug;
 const { template, breadcrumbs, relatedGuideLinks, relatedToolLinks } = await useTemplatePage(slug);
 </script>
 

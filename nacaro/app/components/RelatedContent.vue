@@ -1,9 +1,5 @@
-<script setup lang="ts">
-defineProps<{
-  guideLinks?: { label: string; href: string }[];
-  templateLinks?: { label: string; href: string }[];
-  toolLinks?: { label: string; href: string }[];
-}>();
+<script setup>
+defineProps({});
 </script>
 
 <template>

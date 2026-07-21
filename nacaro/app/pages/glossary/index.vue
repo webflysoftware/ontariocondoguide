@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { collectionPageSchema, definedTermSchema } from '~/utils/schema';
 
 const description = 'Definitions of common HOA and condo governance terms for boards, managers, and homeowners.';

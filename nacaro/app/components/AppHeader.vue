@@ -1,10 +1,10 @@
-<script setup lang="ts">
+<script setup>
 import { NAV_LINKS, SITE } from '~/utils/site';
 
 const route = useRoute();
 const mobileOpen = ref(false);
 
-function isActive(href: string): boolean {
+function isActive(href) {
   if (href === '/') return route.path === '/';
   return route.path === href || route.path.startsWith(`${href}/`);
 }
