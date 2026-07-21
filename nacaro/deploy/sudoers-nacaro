@@ -1,0 +1,17 @@
+# One-time setup on hh3 (adjust deploy user if needed):
+#   sudo visudo -f /etc/sudoers.d/nacaro
+#
+# Replace DEPLOY_USER with the SSH user used by GitHub Actions.
+
+DEPLOY_USER ALL=(root) NOPASSWD: /bin/mkdir -p /var/www/nacaro
+DEPLOY_USER ALL=(root) NOPASSWD: /bin/chown -R dev\:dev /var/www/nacaro
+DEPLOY_USER ALL=(root) NOPASSWD: /bin/cp /tmp/nacaro.nginx /etc/nginx/sites-available/nacaro
+DEPLOY_USER ALL=(root) NOPASSWD: /bin/cp /tmp/nacaro.service /etc/systemd/system/nacaro.service
+DEPLOY_USER ALL=(root) NOPASSWD: /bin/ln -sf /etc/nginx/sites-available/nacaro /etc/nginx/sites-enabled/nacaro
+DEPLOY_USER ALL=(root) NOPASSWD: /usr/sbin/nginx -t
+DEPLOY_USER ALL=(root) NOPASSWD: /bin/systemctl daemon-reload
+DEPLOY_USER ALL=(root) NOPASSWD: /bin/systemctl enable nacaro.service
+DEPLOY_USER ALL=(root) NOPASSWD: /bin/systemctl restart nacaro.service
+DEPLOY_USER ALL=(root) NOPASSWD: /bin/systemctl reload nginx
+DEPLOY_USER ALL=(root) NOPASSWD: /bin/systemctl is-active nacaro.service
+DEPLOY_USER ALL=(root) NOPASSWD: /bin/systemctl status nacaro.service --no-pager

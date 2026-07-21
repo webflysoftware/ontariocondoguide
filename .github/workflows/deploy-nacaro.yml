@@ -1,0 +1,90 @@
+# Deploy NACARO (Nuxt SSR) to hh3 on push to main.
+#
+# Uses the same GitHub secrets as deploy.yml:
+#   SSH_HOST, SSH_USER, SSH_PRIVATE_KEY, SSH_PORT (optional)
+
+name: Deploy NACARO to hh3
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'nacaro/**'
+      - '.github/workflows/deploy-nacaro.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-nacaro-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Build and deploy NACARO
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: nacaro/package-lock.json
+
+      - name: Install dependencies
+        working-directory: nacaro
+        run: npm ci
+
+      - name: Build Nuxt SSR app
+        working-directory: nacaro
+        run: npm run build
+
+      - name: Configure SSH
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "${SSH_PRIVATE_KEY}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "${SSH_HOST}" >> ~/.ssh/known_hosts
+
+      - name: Sync build output to hh3
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+        run: |
+          set -euo pipefail
+          PORT="${SSH_PORT:-22}"
+          rsync -avz --delete \
+            --chmod=D755,F644 \
+            -e "ssh -i ~/.ssh/deploy_key -p ${PORT} -o StrictHostKeyChecking=yes" \
+            nacaro/.output/ \
+            "${SSH_USER}@${SSH_HOST}:/var/www/nacaro/"
+
+      - name: Upload configs and run server deploy script
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+        run: |
+          set -euo pipefail
+          PORT="${SSH_PORT:-22}"
+          scp -i ~/.ssh/deploy_key -P "${PORT}" \
+            nacaro/deploy/nginx.conf \
+            "${SSH_USER}@${SSH_HOST}:/tmp/nacaro.nginx"
+          scp -i ~/.ssh/deploy_key -P "${PORT}" \
+            nacaro/deploy/nacaro.service \
+            "${SSH_USER}@${SSH_HOST}:/tmp/nacaro.service"
+          scp -i ~/.ssh/deploy_key -P "${PORT}" \
+            nacaro/deploy/on-server.sh \
+            "${SSH_USER}@${SSH_HOST}:/tmp/nacaro-deploy.sh"
+          ssh -i ~/.ssh/deploy_key -p "${PORT}" \
+            "${SSH_USER}@${SSH_HOST}" \
+            "chmod +x /tmp/nacaro-deploy.sh && /tmp/nacaro-deploy.sh && rm -f /tmp/nacaro-deploy.sh"

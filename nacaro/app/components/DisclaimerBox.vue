@@ -1,0 +1,10 @@
+<script setup lang="ts">
+import { SITE } from '~/utils/site';
+</script>
+
+<template>
+  <aside class="my-8 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
+    <p class="font-medium">Disclaimer</p>
+    <p class="mt-1">{{ SITE.disclaimer }}</p>
+  </aside>
+</template>

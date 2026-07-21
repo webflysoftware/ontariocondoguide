@@ -1,0 +1,197 @@
+<div class="rounded-lg border border-border bg-white p-6" id="agm-timeline-calculator">
+  <form class="grid gap-4 sm:grid-cols-2" id="agm-timeline-form">
+    <div>
+      <label for="agm-date" class="block text-sm font-medium">Target AGM date</label>
+      <input
+        id="agm-date"
+        name="agmDate"
+        type="date"
+        class="mt-1 w-full rounded-md border border-border px-3 py-2"
+      />
+    </div>
+    <div>
+      <label for="fiscal-year-end" class="block text-sm font-medium"
+        >Fiscal year end (optional)</label
+      >
+      <input
+        id="fiscal-year-end"
+        name="fiscalYearEnd"
+        type="date"
+        class="mt-1 w-full rounded-md border border-border px-3 py-2"
+      />
+    </div>
+    <div>
+      <label for="notice-days" class="block text-sm font-medium"
+        >Minimum meeting notice (days before AGM)</label
+      >
+      <input
+        id="notice-days"
+        name="noticeDays"
+        type="number"
+        min="15"
+        value="15"
+        class="mt-1 w-full rounded-md border border-border px-3 py-2"
+      />
+    </div>
+    <div>
+      <label for="preliminary-days" class="block text-sm font-medium"
+        >Preliminary notice lead time (days before meeting notice)</label
+      >
+      <input
+        id="preliminary-days"
+        name="preliminaryDays"
+        type="number"
+        min="0"
+        value="20"
+        class="mt-1 w-full rounded-md border border-border px-3 py-2"
+      />
+    </div>
+    <div>
+      <label for="proxy-cutoff-days" class="block text-sm font-medium"
+        >Proxy cut-off (days before AGM)</label
+      >
+      <input
+        id="proxy-cutoff-days"
+        name="proxyCutoffDays"
+        type="number"
+        min="0"
+        value="2"
+        class="mt-1 w-full rounded-md border border-border px-3 py-2"
+      />
+    </div>
+    <div>
+      <label for="planning-weeks" class="block text-sm font-medium"
+        >Planning start (weeks before AGM)</label
+      >
+      <input
+        id="planning-weeks"
+        name="planningWeeks"
+        type="number"
+        min="4"
+        value="8"
+        class="mt-1 w-full rounded-md border border-border px-3 py-2"
+      />
+    </div>
+  </form>
+
+  <div
+    class="mt-6 rounded-lg bg-slate-50 p-4 text-sm leading-6"
+    id="agm-timeline-result"
+    aria-live="polite"
+  >
+    Enter a target AGM date to calculate key planning deadlines.
+  </div>
+</div>
+
+<script>
+  function formatDate(date: Date): string {
+    return date.toLocaleDateString('en-CA', {
+      weekday: 'short',
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  }
+
+  function subtractDays(date: Date, days: number): Date {
+    const result = new Date(date);
+    result.setDate(result.getDate() - days);
+    return result;
+  }
+
+  function subtractWeeks(date: Date, weeks: number): Date {
+    return subtractDays(date, weeks * 7);
+  }
+
+  function addMonths(date: Date, months: number): Date {
+    const result = new Date(date);
+    result.setMonth(result.getMonth() + months);
+    return result;
+  }
+
+  function calculateAgmTimeline() {
+    const form = document.getElementById('agm-timeline-form');
+    const result = document.getElementById('agm-timeline-result');
+    if (!(form instanceof HTMLFormElement) || !result) return;
+
+    const data = new FormData(form);
+    const agmDateValue = String(data.get('agmDate') || '');
+    const fiscalYearEndValue = String(data.get('fiscalYearEnd') || '');
+    const noticeDays = Number(data.get('noticeDays')) || 15;
+    const preliminaryDays = Number(data.get('preliminaryDays')) || 0;
+    const proxyCutoffDays = Number(data.get('proxyCutoffDays')) || 0;
+    const planningWeeks = Number(data.get('planningWeeks')) || 8;
+
+    if (!agmDateValue) {
+      result.textContent = 'Enter a target AGM date to calculate key planning deadlines.';
+      return;
+    }
+
+    const agmDate = new Date(`${agmDateValue}T12:00:00`);
+    if (Number.isNaN(agmDate.getTime())) {
+      result.textContent = 'Enter a valid AGM date.';
+      return;
+    }
+
+    const noticeSendDate = subtractDays(agmDate, noticeDays);
+    const preliminaryNoticeDate =
+      preliminaryDays > 0 ? subtractDays(noticeSendDate, preliminaryDays) : null;
+    const proxyCutoffDate = subtractDays(agmDate, proxyCutoffDays);
+    const planningStartDate = subtractWeeks(agmDate, planningWeeks);
+    const nominationOpenDate = subtractWeeks(agmDate, 6);
+    const auditedFinancialsTarget = subtractWeeks(agmDate, 5);
+
+    let fiscalYearWarning = '';
+    if (fiscalYearEndValue) {
+      const fiscalYearEnd = new Date(`${fiscalYearEndValue}T12:00:00`);
+      if (!Number.isNaN(fiscalYearEnd.getTime())) {
+        const latestAgmDate = addMonths(fiscalYearEnd, 6);
+        if (agmDate > latestAgmDate) {
+          fiscalYearWarning = `<p class="mt-3 text-amber-800"><strong>Statutory timing note:</strong> Your target AGM appears to fall after six months from fiscal year-end (${formatDate(latestAgmDate)}). Confirm whether an extension applies and document the reason for delay.</p>`;
+        } else {
+          fiscalYearWarning = `<p class="mt-3 text-slate-600"><strong>Latest AGM date (six months after fiscal year-end):</strong> ${formatDate(latestAgmDate)}</p>`;
+        }
+      }
+    }
+
+    const milestones = [
+      { label: 'Start AGM planning', date: planningStartDate },
+      ...(preliminaryNoticeDate
+        ? [{ label: 'Send preliminary notice of meeting (latest)', date: preliminaryNoticeDate }]
+        : []),
+      { label: 'Open director nominations (suggested)', date: nominationOpenDate },
+      { label: 'Target audited financials ready (suggested)', date: auditedFinancialsTarget },
+      { label: 'Send meeting notice (latest)', date: noticeSendDate },
+      { label: 'Proxy cut-off (if using default)', date: proxyCutoffDate },
+      { label: 'AGM date', date: agmDate },
+    ].sort((a, b) => a.date.getTime() - b.date.getTime());
+
+    const milestoneList = milestones
+      .map(
+        (item) =>
+          `<li><strong>${item.label}:</strong> ${formatDate(item.date)}</li>`
+      )
+      .join('');
+
+    result.innerHTML = `
+      <p><strong>Planning timeline for AGM on ${formatDate(agmDate)}</strong></p>
+      <ul class="mt-3 list-disc space-y-2 pl-5">${milestoneList}</ul>
+      ${fiscalYearWarning}
+      <p class="mt-3 text-slate-600"><strong>Reminder:</strong> These dates use common Ontario defaults (15-day meeting notice, optional 20-day preliminary notice lead time). Your declaration and bylaws may require longer periods. Always confirm with your governing documents and legal counsel.</p>
+      <p class="mt-2 text-slate-600"><strong>Next steps:</strong> Run the <a href="/tools/agm-readiness-check">AGM readiness check</a>, review <a href="/guides/ontario-condo-meeting-notice">meeting notice requirements</a>, and track quorum with the <a href="/tools/quorum-calculator">quorum calculator</a>.</p>
+    `;
+  }
+
+  const form = document.getElementById('agm-timeline-form');
+  form?.addEventListener('input', calculateAgmTimeline);
+  form?.addEventListener('change', calculateAgmTimeline);
+
+  const agmDateInput = document.getElementById('agm-date');
+  if (agmDateInput instanceof HTMLInputElement && !agmDateInput.value) {
+    const defaultDate = new Date();
+    defaultDate.setDate(defaultDate.getDate() + 60);
+    agmDateInput.value = defaultDate.toISOString().slice(0, 10);
+  }
+
+  calculateAgmTimeline();
+</script>

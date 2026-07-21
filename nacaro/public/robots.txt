@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://nacaro.org/sitemap.xml
+
+# LLM / answer-engine discovery
+# https://nacaro.org/llms.txt
+# https://nacaro.org/llms-full.txt

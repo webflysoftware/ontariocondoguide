@@ -1,0 +1,23 @@
+[Unit]
+Description=NACARO Nuxt SSR application
+After=network.target
+
+[Service]
+Type=simple
+User=dev
+Group=dev
+WorkingDirectory=/var/www/nacaro
+Environment=NODE_ENV=production
+Environment=HOST=127.0.0.1
+Environment=PORT=3090
+Environment=NITRO_HOST=127.0.0.1
+Environment=NITRO_PORT=3090
+ExecStart=/usr/bin/node /var/www/nacaro/server/index.mjs
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=nacaro
+
+[Install]
+WantedBy=multi-user.target

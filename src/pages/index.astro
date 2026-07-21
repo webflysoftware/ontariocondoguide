@@ -41,13 +41,23 @@ const categoryCounts = CATEGORIES.reduce<Record<string, number>>((acc, cat) => {
 
 const pillars = [
   {
+    title: 'Legislation & compliance',
+    description: 'Track Bill 72, CAO filings, and regulatory changes affecting Ontario condo governance.',
+    href: '/guides/bill-72-condo-act-changes-explained',
+    guides: [
+      { label: 'Bill 72 Condo Act Changes', href: '/guides/bill-72-condo-act-changes-explained' },
+      { label: 'CAO Annual Return Filing (2026)', href: '/guides/cao-annual-return-filing-2026' },
+      { label: 'Reserve Fund Reforms Update', href: '/guides/ontario-condo-reserve-fund-reforms-2026' },
+    ],
+  },
+  {
     title: 'AGM planning',
     description: 'Prepare notices, agendas, quorum, and owner participation for annual general meetings.',
     href: '/guides/ontario-condo-agm-guide',
     guides: [
       { label: 'Ontario Condo AGM Guide', href: '/guides/ontario-condo-agm-guide' },
       { label: 'How to Prepare for a Condo AGM', href: '/guides/how-to-prepare-condo-agm' },
-      { label: 'AGM Checklist', href: '/templates/agm-checklist' },
+      { label: 'AGM Timeline Calculator', href: '/tools/agm-timeline-calculator' },
     ],
   },
   {
@@ -139,7 +149,7 @@ const pillars = [
 
     <section class="mt-14">
       <h2 class="text-2xl font-semibold">Start with a topic pillar</h2>
-      <div class="mt-6 grid gap-6 lg:grid-cols-3">
+      <div class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {pillars.map((pillar) => <TopicPillar {...pillar} />)}
       </div>
     </section>
