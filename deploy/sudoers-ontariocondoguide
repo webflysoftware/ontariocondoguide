@@ -4,7 +4,13 @@
 # Replace DEPLOY_USER with the SSH user used by GitHub Actions.
 
 DEPLOY_USER ALL=(root) NOPASSWD: /bin/mkdir -p /var/www/ontariocondoguide
+DEPLOY_USER ALL=(root) NOPASSWD: /bin/mkdir -p /var/www/ontariocondoguide-api
+DEPLOY_USER ALL=(root) NOPASSWD: /bin/mkdir -p /var/lib/ontariocondoguide/newsletter
 DEPLOY_USER ALL=(root) NOPASSWD: /bin/cp /tmp/ontariocondoguide.nginx /etc/nginx/sites-available/ontariocondoguide
+DEPLOY_USER ALL=(root) NOPASSWD: /bin/cp /tmp/ontariocondoguide-api.service /etc/systemd/system/ontariocondoguide-api.service
 DEPLOY_USER ALL=(root) NOPASSWD: /bin/ln -sf /etc/nginx/sites-available/ontariocondoguide /etc/nginx/sites-enabled/ontariocondoguide
+DEPLOY_USER ALL=(root) NOPASSWD: /bin/systemctl daemon-reload
+DEPLOY_USER ALL=(root) NOPASSWD: /bin/systemctl enable ontariocondoguide-api.service
+DEPLOY_USER ALL=(root) NOPASSWD: /bin/systemctl restart ontariocondoguide-api.service
 DEPLOY_USER ALL=(root) NOPASSWD: /usr/sbin/nginx -t
 DEPLOY_USER ALL=(root) NOPASSWD: /bin/systemctl reload nginx

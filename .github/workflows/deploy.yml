@@ -73,6 +73,20 @@ jobs:
             dist/ \
             "${SSH_USER}@${SSH_HOST}:/var/www/ontariocondoguide/"
 
+      - name: Sync API service to hh3
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+        run: |
+          set -euo pipefail
+          PORT="${SSH_PORT:-22}"
+          rsync -avz \
+            --chmod=D755,F644 \
+            -e "ssh -i ~/.ssh/deploy_key -p ${PORT} -o StrictHostKeyChecking=yes" \
+            server/ \
+            "${SSH_USER}@${SSH_HOST}:/var/www/ontariocondoguide-api/"
+
       - name: Upload nginx config and run server deploy script
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
@@ -84,6 +98,9 @@ jobs:
           scp -i ~/.ssh/deploy_key -P "${PORT}" \
             deploy/nginx.conf \
             "${SSH_USER}@${SSH_HOST}:/tmp/ontariocondoguide.nginx"
+          scp -i ~/.ssh/deploy_key -P "${PORT}" \
+            deploy/ontariocondoguide-api.service \
+            "${SSH_USER}@${SSH_HOST}:/tmp/ontariocondoguide-api.service"
           scp -i ~/.ssh/deploy_key -P "${PORT}" \
             deploy/on-server.sh \
             "${SSH_USER}@${SSH_HOST}:/tmp/ontariocondoguide-deploy.sh"

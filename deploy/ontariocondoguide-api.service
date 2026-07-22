@@ -1,0 +1,23 @@
+[Unit]
+Description=Ontario Condo Guide API (newsletter + forms)
+After=network.target
+
+[Service]
+Type=simple
+User=dev
+Group=dev
+WorkingDirectory=/var/www/ontariocondoguide-api
+Environment=NODE_ENV=production
+Environment=HOST=127.0.0.1
+Environment=PORT=3091
+Environment=NEWSLETTER_DATA_DIR=/var/lib/ontariocondoguide/newsletter
+EnvironmentFile=-/etc/ontariocondoguide/api.env
+ExecStart=/usr/bin/node /var/www/ontariocondoguide-api/index.mjs
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=ontariocondoguide-api
+
+[Install]
+WantedBy=multi-user.target

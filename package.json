@@ -7,6 +7,7 @@
   },
   "scripts": {
     "dev": "astro dev",
+    "dev:api": "node server/index.mjs",
     "build": "astro build && pagefind --site dist",
     "preview": "astro preview",
     "astro": "astro"

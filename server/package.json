@@ -1,0 +1,12 @@
+{
+  "name": "ontariocondoguide-api",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "start": "node index.mjs",
+    "dev": "node --watch index.mjs"
+  }
+}

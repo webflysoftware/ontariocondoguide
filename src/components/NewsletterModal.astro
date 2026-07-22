@@ -1,0 +1,235 @@
+<dialog
+  id="newsletter-modal"
+  class="newsletter-modal w-[min(100%,28rem)] rounded-xl border border-border bg-white p-0 shadow-xl backdrop:bg-slate-900/50"
+  aria-labelledby="newsletter-modal-title"
+>
+  <form id="newsletter-form" class="p-6">
+    <div class="flex items-start justify-between gap-4">
+      <div>
+        <p class="text-sm font-medium text-brand-700">Mailing list</p>
+        <h2 id="newsletter-modal-title" class="mt-1 text-xl font-semibold text-slate-900">
+          Get Ontario condo updates
+        </h2>
+      </div>
+      <button
+        type="button"
+        id="newsletter-close"
+        class="rounded-md p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+        aria-label="Close newsletter signup"
+      >
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+
+    <p class="mt-3 text-sm leading-6 text-slate-600">
+      Occasional email updates on Ontario condo law changes, new guides, tools, and practical
+      governance news. No spam — unsubscribe anytime.
+    </p>
+
+    <div class="mt-5">
+      <label for="newsletter-email" class="block text-sm font-medium text-slate-900">Email</label>
+      <input
+        id="newsletter-email"
+        name="email"
+        type="email"
+        required
+        autocomplete="email"
+        inputmode="email"
+        placeholder="you@example.com"
+        class="mt-1 w-full rounded-md border border-border px-3 py-2.5"
+      />
+    </div>
+
+    <input
+      type="text"
+      name="website"
+      tabindex="-1"
+      autocomplete="off"
+      aria-hidden="true"
+      class="sr-only"
+    />
+
+    <p id="newsletter-error" class="mt-3 hidden text-sm text-red-700" role="alert"></p>
+    <p id="newsletter-success" class="mt-3 hidden text-sm text-green-700" role="status">
+      Thanks — you are subscribed.
+    </p>
+
+    <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
+      <button
+        type="submit"
+        id="newsletter-submit"
+        class="rounded-md bg-brand-700 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-800 disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        Subscribe
+      </button>
+      <button
+        type="button"
+        id="newsletter-dismiss"
+        class="text-sm font-medium text-slate-600 hover:text-slate-900"
+      >
+        Not now
+      </button>
+    </div>
+
+    <p class="mt-4 text-xs leading-5 text-muted">
+      See our <a href="/privacy">privacy policy</a>. Educational updates only — not legal advice.
+    </p>
+  </form>
+</dialog>
+
+<style>
+  .newsletter-modal::backdrop {
+    background: rgb(15 23 42 / 0.55);
+  }
+
+  .newsletter-modal[open] {
+    margin: auto;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>
+
+<script>
+  const STORAGE_KEY = 'ocg-newsletter-status';
+  const MODAL_DELAY_MS = 4000;
+
+  function getStatus() {
+    try {
+      return localStorage.getItem(STORAGE_KEY);
+    } catch {
+      return null;
+    }
+  }
+
+  function setStatus(value) {
+    try {
+      localStorage.setItem(STORAGE_KEY, value);
+    } catch {
+      // Ignore storage failures.
+    }
+  }
+
+  function openModal() {
+    const modal = document.getElementById('newsletter-modal');
+    if (!(modal instanceof HTMLDialogElement) || modal.open) return;
+    modal.showModal();
+  }
+
+  function closeModal(persistDismiss = false) {
+    const modal = document.getElementById('newsletter-modal');
+    if (!(modal instanceof HTMLDialogElement) || !modal.open) return;
+    modal.close();
+    if (persistDismiss) setStatus('dismissed');
+  }
+
+  function showError(message) {
+    const error = document.getElementById('newsletter-error');
+    const success = document.getElementById('newsletter-success');
+    if (error) {
+      error.textContent = message;
+      error.classList.remove('hidden');
+    }
+    success?.classList.add('hidden');
+  }
+
+  function showSuccess() {
+    const error = document.getElementById('newsletter-error');
+    const success = document.getElementById('newsletter-success');
+    error?.classList.add('hidden');
+    success?.classList.remove('hidden');
+  }
+
+  document.getElementById('newsletter-close')?.addEventListener('click', () => {
+    closeModal(true);
+  });
+
+  document.getElementById('newsletter-dismiss')?.addEventListener('click', () => {
+    closeModal(true);
+  });
+
+  document.getElementById('newsletter-modal')?.addEventListener('cancel', (event) => {
+    event.preventDefault();
+    closeModal(true);
+  });
+
+  document.getElementById('newsletter-modal')?.addEventListener('click', (event) => {
+    const modal = event.currentTarget;
+    if (!(modal instanceof HTMLDialogElement) || event.target !== modal) return;
+    closeModal(true);
+  });
+
+  document.getElementById('newsletter-form')?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const form = event.currentTarget;
+    if (!(form instanceof HTMLFormElement)) return;
+
+    const submitButton = document.getElementById('newsletter-submit');
+    const formData = new FormData(form);
+    const email = String(formData.get('email') || '').trim();
+    const website = String(formData.get('website') || '').trim();
+
+    if (!email) {
+      showError('Please enter your email address.');
+      return;
+    }
+
+    if (submitButton instanceof HTMLButtonElement) {
+      submitButton.disabled = true;
+      submitButton.textContent = 'Subscribing…';
+    }
+
+    try {
+      const response = await fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          website,
+          source: 'modal',
+          page: window.location.pathname,
+        }),
+      });
+
+      const payload = await response.json().catch(() => ({}));
+
+      if (!response.ok || !payload.ok) {
+        throw new Error(payload.error || 'Subscription failed. Please try again.');
+      }
+
+      setStatus('subscribed');
+      showSuccess();
+
+      window.setTimeout(() => closeModal(false), 1800);
+    } catch (error) {
+      showError(error instanceof Error ? error.message : 'Subscription failed. Please try again.');
+    } finally {
+      if (submitButton instanceof HTMLButtonElement) {
+        submitButton.disabled = false;
+        submitButton.textContent = 'Subscribe';
+      }
+    }
+  });
+
+  document.querySelectorAll('[data-open-newsletter]').forEach((trigger) => {
+    trigger.addEventListener('click', (event) => {
+      event.preventDefault();
+      openModal();
+    });
+  });
+
+  const status = getStatus();
+  if (status !== 'subscribed' && status !== 'dismissed') {
+    window.setTimeout(openModal, MODAL_DELAY_MS);
+  }
+</script>

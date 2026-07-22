@@ -10,6 +10,11 @@ export default defineConfig({
   trailingSlash: 'never',
   vite: {
     plugins: [tailwindcss()],
+    server: {
+      proxy: {
+        '/api': 'http://127.0.0.1:3091',
+      },
+    },
   },
   integrations: [mdx(), sitemap()],
 });
