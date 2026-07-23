@@ -24,11 +24,20 @@ fi
 
 sudo systemctl restart nacaro.service
 
-if ! curl -sf http://127.0.0.1:3090/ >/dev/null; then
-  echo "Deploy failed: NACARO app not responding on port 3090" >&2
-  sudo systemctl status nacaro.service --no-pager || true
-  exit 1
-fi
+# Wait for app to start (up to 30 seconds)
+echo "Waiting for NACARO app to start..."
+for i in {1..30}; do
+  if curl -sf http://127.0.0.1:3090/ >/dev/null; then
+    echo "NACARO app is responding on port 3090"
+    break
+  fi
+  if [[ $i -eq 30 ]]; then
+    echo "Deploy failed: NACARO app not responding on port 3090 after 30 seconds" >&2
+    sudo systemctl status nacaro.service --no-pager || true
+    exit 1
+  fi
+  sleep 1
+done
 
 if [[ -f "${NGINX_STAGING}" ]]; then
   sudo cp "${NGINX_STAGING}" "${NGINX_AVAILABLE}"
