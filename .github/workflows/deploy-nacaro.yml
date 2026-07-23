@@ -38,6 +38,10 @@ jobs:
         working-directory: nacaro
         run: npm ci
 
+      - name: Generate Nuxt types
+        working-directory: nacaro
+        run: npx nuxt prepare
+
       - name: Build Nuxt SSR app
         working-directory: nacaro
         run: npm run build

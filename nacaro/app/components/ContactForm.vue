@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { SITE } from '~/utils/site';
 
 const form = reactive({
@@ -11,7 +11,7 @@ const form = reactive({
   website: '',
 });
 
-const status = ref<'idle' | 'loading' | 'success' | 'error'>('idle');
+const status = ref('idle');
 const errorMessage = ref('');
 
 async function submitForm() {
@@ -33,7 +33,7 @@ async function submitForm() {
       },
     });
     status.value = 'success';
-  } catch (error: unknown) {
+  } catch (error) {
     status.value = 'error';
     errorMessage.value =
       error instanceof Error

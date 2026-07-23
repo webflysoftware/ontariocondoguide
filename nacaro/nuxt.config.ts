@@ -1,6 +1,6 @@
 import tailwindcss from '@tailwindcss/vite';
-import { cpSync, existsSync, mkdirSync } from 'node:fs';
-import { join } from 'node:path';
+import { cpSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
+import { join, resolve } from 'node:path';
 
 function copyContentToOutput(rootDir: string, outputDir = join(rootDir, '.output')) {
   const source = join(rootDir, 'content');
@@ -19,6 +19,22 @@ export default defineNuxtConfig({
   ssr: true,
   devtools: { enabled: true },
   css: ['~/assets/css/main.css'],
+  typescript: {
+    typeCheck: false,
+    tsConfig: {
+      compilerOptions: {
+        paths: {
+          '~': ['./app'],
+          '~/*': ['./app/*'],
+          '@': ['./app'],
+          '@/*': ['./app/*'],
+        },
+      },
+    },
+  },
+  experimental: {
+    typedPages: false,
+  },
   hooks: {
     'build:done'() {
       copyContentToOutput(process.cwd());
@@ -37,6 +53,12 @@ export default defineNuxtConfig({
   },
   vite: {
     plugins: [tailwindcss()],
+    vue: {
+      script: {
+        defineModel: true,
+        propsDestructure: false,
+      },
+    },
   },
   runtimeConfig: {
     contactTo: process.env.NUXT_CONTACT_TO || '',

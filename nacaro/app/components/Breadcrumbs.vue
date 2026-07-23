@@ -1,7 +1,7 @@
-<script setup lang="ts">
-defineProps<{
-  items: { name: string; path: string }[];
-}>();
+<script setup>
+defineProps({
+  items: Array
+});
 </script>
 
 <template>

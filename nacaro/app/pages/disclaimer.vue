@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { SITE } from '~/utils/site';
 
 const description = SITE.disclaimer;

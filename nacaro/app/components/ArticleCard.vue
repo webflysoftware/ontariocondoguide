@@ -1,13 +1,6 @@
-<script setup lang="ts">
-import type { Category } from '~/utils/site';
+<script setup>
 
-defineProps<{
-  title: string;
-  summary: string;
-  href: string;
-  category: Category;
-  meta?: string;
-}>();
+defineProps({});
 </script>
 
 <template>

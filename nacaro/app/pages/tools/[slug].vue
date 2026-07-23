@@ -1,8 +1,8 @@
-<script setup lang="ts">
+<script setup>
 import { AGM_READINESS_ITEMS, ELECTION_READINESS_ITEMS } from '~/utils/tools';
 
 const route = useRoute();
-const slug = route.params.slug as string;
+const slug = route.params.slug;
 const { tool, breadcrumbs, relatedGuideLinks, relatedTemplateLinks } = await useToolPage(slug);
 </script>
 

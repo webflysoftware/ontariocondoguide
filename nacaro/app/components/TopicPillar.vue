@@ -1,10 +1,5 @@
-<script setup lang="ts">
-defineProps<{
-  title: string;
-  description: string;
-  href: string;
-  guides: readonly { label: string; href: string }[];
-}>();
+<script setup>
+defineProps({});
 </script>
 
 <template>

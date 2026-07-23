@@ -1,9 +1,6 @@
-<script setup lang="ts">
-import type { FaqItem } from '~/utils/schema';
+<script setup>
 
-defineProps<{
-  faqs: FaqItem[];
-}>();
+defineProps({});
 </script>
 
 <template>

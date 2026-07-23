@@ -1,6 +1,6 @@
-<script setup lang="ts">
+<script setup>
 const route = useRoute();
-const slug = route.params.slug as string;
+const slug = route.params.slug;
 const { term, breadcrumbs, relatedGuideLinks } = await useGlossaryPage(slug);
 </script>
 

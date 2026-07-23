@@ -1,10 +1,7 @@
-<script setup lang="ts">
-const props = defineProps<{
-  title: string;
-  items: string[];
-}>();
+<script setup>
+const props = defineProps({});
 
-const checked = ref<boolean[]>(props.items.map(() => false));
+const checked = ref(props.items.map(() => false));
 
 const summary = computed(() => {
   const total = props.items.length;
