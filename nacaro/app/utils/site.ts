@@ -74,13 +74,13 @@ export const NAV_LINKS = [
   { href: '/forms', label: 'Forms' },
   { href: '/templates', label: 'Templates' },
   { href: '/tools', label: 'Tools' },
-  { href: '/glossary', label: 'Glossary' },
-  { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact' },
 ] as const;
 
 export const FOOTER_LINKS = [
   ...NAV_LINKS,
+  { href: '/glossary', label: 'Glossary' },
+  { href: '/about', label: 'About' },
   { href: '/disclaimer', label: 'Disclaimer' },
   { href: '/privacy', label: 'Privacy' },
 ] as const;

@@ -3,9 +3,9 @@ import { SITE } from '~/utils/site';
 
 const quickLinks = [
   { href: '/guides', label: 'Guides' },
+  { href: '/forms', label: 'Forms' },
   { href: '/templates', label: 'Templates' },
   { href: '/tools', label: 'Tools' },
-  { href: '/glossary', label: 'Glossary' },
 ];
 </script>
 
