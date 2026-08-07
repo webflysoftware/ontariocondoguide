@@ -1,7 +1,12 @@
 <script setup lang="ts">
-defineProps<{
-  items: { name: string; path: string }[];
-}>();
+import type { PropType } from 'vue';
+
+defineProps({
+  items: {
+    type: Array as PropType<{ name: string; path: string }[]>,
+    required: true,
+  },
+});
 </script>
 
 <template>

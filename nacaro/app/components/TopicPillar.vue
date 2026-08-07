@@ -1,10 +1,15 @@
 <script setup lang="ts">
-defineProps<{
-  title: string;
-  description: string;
-  href: string;
-  guides: readonly { label: string; href: string }[];
-}>();
+import type { PropType } from 'vue';
+
+defineProps({
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  href: { type: String, required: true },
+  guides: {
+    type: Array as PropType<readonly { label: string; href: string }[]>,
+    required: true,
+  },
+});
 </script>
 
 <template>

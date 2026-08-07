@@ -1,9 +1,22 @@
 <script setup lang="ts">
-defineProps<{
-  guideLinks?: { label: string; href: string }[];
-  templateLinks?: { label: string; href: string }[];
-  toolLinks?: { label: string; href: string }[];
-}>();
+import type { PropType } from 'vue';
+
+type RelatedLink = { label: string; href: string };
+
+defineProps({
+  guideLinks: {
+    type: Array as PropType<RelatedLink[]>,
+    required: false,
+  },
+  templateLinks: {
+    type: Array as PropType<RelatedLink[]>,
+    required: false,
+  },
+  toolLinks: {
+    type: Array as PropType<RelatedLink[]>,
+    required: false,
+  },
+});
 </script>
 
 <template>

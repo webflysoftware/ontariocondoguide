@@ -1,9 +1,13 @@
 <script setup lang="ts">
+import type { PropType } from 'vue';
 import type { FaqItem } from '~/utils/schema';
 
-defineProps<{
-  faqs: FaqItem[];
-}>();
+defineProps({
+  faqs: {
+    type: Array as PropType<FaqItem[]>,
+    required: true,
+  },
+});
 </script>
 
 <template>

@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import type { Category } from '~/utils/site';
-
-defineProps<{
-  title: string;
-  summary: string;
-  href: string;
-  category: Category;
-  meta?: string;
-}>();
+defineProps({
+  title: { type: String, required: true },
+  summary: { type: String, required: true },
+  href: { type: String, required: true },
+  category: { type: String, required: true },
+  meta: { type: String, required: false },
+});
 </script>
 
 <template>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-defineProps<{
-  html: string;
-}>();
+defineProps({
+  html: { type: String, required: true },
+});
 </script>
 
 <template>

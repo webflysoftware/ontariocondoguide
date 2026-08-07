@@ -1,10 +1,10 @@
 <script setup lang="ts">
-defineProps<{
-  title: string;
-  description: string;
-  href: string;
-  count?: number;
-}>();
+defineProps({
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  href: { type: String, required: true },
+  count: { type: Number, required: false },
+});
 </script>
 
 <template>
