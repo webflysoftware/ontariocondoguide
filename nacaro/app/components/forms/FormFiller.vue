@@ -1,43 +1,35 @@
-<script setup lang="ts">
-import {
-  getAllFields,
-  isFieldVisible,
-  validateForm,
-  type FieldValue,
-  type FormAnswers,
-  type FormField,
-  type FormSchema,
-} from '#shared/forms';
+<script setup>
+import { getAllFields, isFieldVisible, validateForm } from '#shared/forms';
 
-const props = defineProps<{
-  schema: FormSchema;
-  fillUrl: string;
-  downloadUrl: string;
-  officialSourceUrl: string;
-}>();
+const props = defineProps({
+  schema: { type: Object, required: true },
+  fillUrl: { type: String, required: true },
+  downloadUrl: { type: String, required: true },
+  officialSourceUrl: { type: String, required: true },
+});
 
-const answers = reactive<FormAnswers>({});
+const answers = reactive({});
 for (const field of getAllFields(props.schema)) {
   if (field.fixedValue !== undefined) continue;
   if (field.type === 'checkbox-group') answers[field.id] = [];
   else if (field.type === 'checkbox') answers[field.id] = false;
-  else answers[field.id] = (field.defaultValue as FieldValue) ?? '';
+  else answers[field.id] = field.defaultValue ?? '';
 }
 
-const errors = ref<Record<string, string>>({});
-const status = ref<'idle' | 'loading' | 'success' | 'error'>('idle');
+const errors = ref({});
+const status = ref('idle');
 const serverMessage = ref('');
 
-function fieldVisible(field: FormField): boolean {
+function fieldVisible(field) {
   return isFieldVisible(field, answers);
 }
 
-function visibleFields(fields: FormField[]): FormField[] {
+function visibleFields(fields) {
   return fields.filter(fieldVisible);
 }
 
-function toggleGroup(fieldId: string, value: string, checked: boolean) {
-  const current = Array.isArray(answers[fieldId]) ? [...(answers[fieldId] as string[])] : [];
+function toggleGroup(fieldId, value, checked) {
+  const current = Array.isArray(answers[fieldId]) ? [...answers[fieldId]] : [];
   if (checked) {
     if (!current.includes(value)) current.push(value);
   } else {
@@ -47,9 +39,17 @@ function toggleGroup(fieldId: string, value: string, checked: boolean) {
   answers[fieldId] = current;
 }
 
-function validate(): boolean {
+function isGroupChecked(fieldId, value) {
+  return Array.isArray(answers[fieldId]) && answers[fieldId].includes(value);
+}
+
+function onGroupChange(fieldId, value, event) {
+  toggleGroup(fieldId, value, Boolean(event?.target?.checked));
+}
+
+function validate() {
   const found = validateForm(props.schema, { ...answers });
-  const map: Record<string, string> = {};
+  const map = {};
   for (const e of found) map[e.field] = e.message;
   errors.value = map;
   return found.length === 0;
@@ -61,10 +61,10 @@ async function scrollToFirstError() {
   if (!firstId) return;
   const el = document.getElementById(`field-${firstId}`);
   el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  (el?.querySelector('input, select, textarea') as HTMLElement | null)?.focus();
+  el?.querySelector('input, select, textarea')?.focus();
 }
 
-function triggerDownload(blob: Blob) {
+function triggerDownload(blob) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -86,19 +86,18 @@ async function generate() {
 
   status.value = 'loading';
   try {
-    const blob = await $fetch<Blob>(props.fillUrl, {
+    const blob = await $fetch(props.fillUrl, {
       method: 'POST',
       body: { answers: { ...answers } },
       responseType: 'blob',
     });
     triggerDownload(blob);
     status.value = 'success';
-  } catch (error: unknown) {
+  } catch (error) {
     status.value = 'error';
-    const data = (error as { data?: { data?: { errors?: { field: string; message: string }[] } } })?.data;
-    const serverErrors = data?.data?.errors;
+    const serverErrors = error?.data?.data?.errors;
     if (serverErrors?.length) {
-      const map: Record<string, string> = {};
+      const map = {};
       for (const e of serverErrors) map[e.field] = e.message;
       errors.value = map;
       serverMessage.value = 'Please fix the highlighted fields.';
@@ -209,9 +208,9 @@ const inputClass =
                     <input
                       type="checkbox"
                       :value="opt.value"
-                      :checked="Array.isArray(answers[field.id]) && (answers[field.id] as string[]).includes(opt.value)"
+                      :checked="isGroupChecked(field.id, opt.value)"
                       class="mt-0.5 h-4 w-4 rounded border-border text-brand-700 focus:ring-brand-500/40"
-                      @change="toggleGroup(field.id, opt.value, ($event.target as HTMLInputElement).checked)"
+                      @change="onGroupChange(field.id, opt.value, $event)"
                     />
                     <span class="text-sm leading-6 text-slate-800">{{ opt.label }}</span>
                   </label>

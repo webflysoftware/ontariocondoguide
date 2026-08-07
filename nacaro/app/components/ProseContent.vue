@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 defineProps({
   html: { type: String, required: true },
 });

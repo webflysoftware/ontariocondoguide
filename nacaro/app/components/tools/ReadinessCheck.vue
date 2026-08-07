@@ -1,9 +1,8 @@
-<script setup lang="ts">
-import type { PropType } from 'vue';
+<script setup>
 
 const props = defineProps({
   title: { type: String, required: true },
-  items: { type: Array as PropType<string[]>, required: true },
+  items: { type: Array, required: true },
 });
 
 const checked = ref(props.items.map(() => false));

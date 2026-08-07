@@ -1,12 +1,11 @@
-<script setup lang="ts">
-import type { PropType } from 'vue';
+<script setup>
 
 defineProps({
   title: { type: String, required: true },
   description: { type: String, required: true },
   href: { type: String, required: true },
   guides: {
-    type: Array as PropType<readonly { label: string; href: string }[]>,
+    type: Array,
     required: true,
   },
 });

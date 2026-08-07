@@ -1,19 +1,15 @@
-<script setup lang="ts">
-import type { PropType } from 'vue';
-
-type RelatedLink = { label: string; href: string };
-
+<script setup>
 defineProps({
   guideLinks: {
-    type: Array as PropType<RelatedLink[]>,
+    type: Array,
     required: false,
   },
   templateLinks: {
-    type: Array as PropType<RelatedLink[]>,
+    type: Array,
     required: false,
   },
   toolLinks: {
-    type: Array as PropType<RelatedLink[]>,
+    type: Array,
     required: false,
   },
 });
