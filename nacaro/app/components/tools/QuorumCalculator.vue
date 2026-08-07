@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 const totalUnits = ref(100);
 const quorumPercent = ref(25);
 const attendees = ref(10);

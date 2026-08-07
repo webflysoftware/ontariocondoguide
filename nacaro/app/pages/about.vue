@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { SITE } from '~/utils/site';
 
 const description = `${SITE.fullName} (${SITE.name}) is an independent educational resource for HOA and condo governance in the United States.`;

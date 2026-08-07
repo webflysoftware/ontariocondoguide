@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { CATEGORIES, CATEGORY_META } from '~/utils/site';
 import { collectionPageSchema, itemListSchema } from '~/utils/schema';
 

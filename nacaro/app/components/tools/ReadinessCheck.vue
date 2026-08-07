@@ -1,10 +1,12 @@
 <script setup lang="ts">
-const props = defineProps<{
-  title: string;
-  items: string[];
-}>();
+import type { PropType } from 'vue';
 
-const checked = ref<boolean[]>(props.items.map(() => false));
+const props = defineProps({
+  title: { type: String, required: true },
+  items: { type: Array as PropType<string[]>, required: true },
+});
+
+const checked = ref(props.items.map(() => false));
 
 const summary = computed(() => {
   const total = props.items.length;

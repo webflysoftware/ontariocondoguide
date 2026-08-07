@@ -19,6 +19,22 @@ export default defineNuxtConfig({
   ssr: true,
   devtools: { enabled: true },
   css: ['~/assets/css/main.css'],
+  typescript: {
+    typeCheck: false,
+    tsConfig: {
+      compilerOptions: {
+        paths: {
+          '~': ['./app'],
+          '~/*': ['./app/*'],
+          '@': ['./app'],
+          '@/*': ['./app/*'],
+        },
+      },
+    },
+  },
+  experimental: {
+    typedPages: false,
+  },
   hooks: {
     'build:done'() {
       copyContentToOutput(process.cwd());
@@ -40,6 +56,12 @@ export default defineNuxtConfig({
     server: {
       // Allow importing the repo-root shared/condo-forms package from the client.
       fs: { allow: ['..'] },
+    },
+    vue: {
+      script: {
+        defineModel: true,
+        propsDestructure: false,
+      },
     },
   },
   runtimeConfig: {

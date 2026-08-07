@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { FOOTER_LINKS, SITE } from '~/utils/site';
 </script>
 
