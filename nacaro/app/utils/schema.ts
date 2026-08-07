@@ -18,7 +18,7 @@ export interface IndexListItem {
   summary: string;
   href: string;
   category?: string;
-  type: 'guide' | 'template' | 'tool' | 'glossary';
+  type: 'guide' | 'template' | 'tool' | 'glossary' | 'form';
   featured?: boolean;
   lastUpdated?: string;
 }

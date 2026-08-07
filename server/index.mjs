@@ -1,6 +1,9 @@
 import { appendFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { join } from 'node:path';
+import * as pdfLib from 'pdf-lib';
+import { getFormSchema } from '../shared/condo-forms/index.js';
+import { generateFilledPdf } from '../shared/condo-forms/pdf.js';
 
 const PORT = Number(process.env.PORT || 3091);
 const HOST = process.env.HOST || '127.0.0.1';
@@ -21,14 +24,14 @@ function sanitize(value, maxLength = 320) {
     .slice(0, maxLength);
 }
 
-function readJsonBody(req) {
+function readJsonBody(req, maxBytes = 16_384) {
   return new Promise((resolve, reject) => {
     const chunks = [];
     let size = 0;
 
     req.on('data', (chunk) => {
       size += chunk.length;
-      if (size > 16_384) {
+      if (size > maxBytes) {
         reject(new Error('Payload too large'));
         req.destroy();
         return;
@@ -161,6 +164,45 @@ async function handleNewsletterSubscribe(req, res, ip) {
   sendJson(res, 200, { ok: true, duplicate: isDuplicate });
 }
 
+async function handleFormFill(req, res, slug) {
+  const schema = getFormSchema(slug);
+  if (!schema) {
+    sendJson(res, 404, { ok: false, error: 'Form not found' });
+    return;
+  }
+
+  let body;
+  try {
+    // Answers can include long text areas and multi-selects; allow up to 256 KB.
+    body = await readJsonBody(req, 262_144);
+  } catch (error) {
+    sendJson(res, 400, { ok: false, error: error.message || 'Invalid request body' });
+    return;
+  }
+
+  const answers = body?.answers ?? {};
+
+  try {
+    const { bytes, fileName } = await generateFilledPdf(slug, answers, {
+      pdfLib,
+      brand: 'Ontario Condo Guide',
+    });
+    res.writeHead(200, {
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="${fileName}"`,
+      'Cache-Control': 'no-store',
+    });
+    res.end(Buffer.from(bytes));
+  } catch (error) {
+    if (error && error.validation) {
+      sendJson(res, 422, { ok: false, error: 'Validation failed', errors: error.validation });
+      return;
+    }
+    console.error('[forms] Fill failed:', error);
+    sendJson(res, 500, { ok: false, error: 'Could not generate the filled PDF.' });
+  }
+}
+
 function sendJson(res, statusCode, payload) {
   res.writeHead(statusCode, {
     'Content-Type': 'application/json; charset=utf-8',
@@ -188,6 +230,12 @@ const server = createServer(async (req, res) => {
 
   if (req.method === 'POST' && url.pathname === '/api/newsletter/subscribe') {
     await handleNewsletterSubscribe(req, res, ip);
+    return;
+  }
+
+  const fillMatch = url.pathname.match(/^\/api\/forms\/([a-z0-9-]+)\/fill$/);
+  if (req.method === 'POST' && fillMatch) {
+    await handleFormFill(req, res, fillMatch[1]);
     return;
   }
 

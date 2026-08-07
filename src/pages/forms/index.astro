@@ -1,0 +1,42 @@
+---
+import LandingPageLayout from '../../layouts/LandingPageLayout.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import { contentPath, getPublishedForms, slugFromEntry } from '../../lib/content';
+
+const forms = await getPublishedForms();
+---
+
+<LandingPageLayout
+  title="Ontario Condo Forms"
+  description="Mandatory Ontario condo forms with plain-language guidance, guided online pre-fill, and a downloadable completed PDF."
+  path="/forms"
+  heading="Ontario Condo Forms"
+>
+  <p class="max-w-2xl text-lg leading-8 text-slate-700">
+    The mandatory forms Ontario condo owners, boards, and managers need — each with plain-language
+    guidance you can fill out online, then download a completed PDF to print and sign.
+  </p>
+
+  <div class="mt-6 max-w-2xl rounded-lg border border-brand-100 bg-brand-50 p-4 text-sm leading-6 text-slate-700">
+    <p class="font-medium text-slate-900">How this works</p>
+    <p class="mt-1">
+      Fill out a form with guidance and download a clean, completed PDF to print and sign. You can
+      also download the blank official form on each page. These tools provide general information,
+      not legal advice.
+    </p>
+  </div>
+
+  <div class="mt-10 grid gap-4 sm:grid-cols-2">
+    {
+      forms.map((form) => (
+        <ArticleCard
+          title={form.data.title}
+          href={contentPath('forms', slugFromEntry(form))}
+          summary={form.data.summary}
+          category={form.data.category}
+          meta="Guided pre-fill · Downloadable PDF"
+        />
+      ))
+    }
+  </div>
+</LandingPageLayout>

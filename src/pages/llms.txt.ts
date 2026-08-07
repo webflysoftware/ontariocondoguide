@@ -23,7 +23,7 @@ export const GET: APIRoute = async () => {
     `> ${SITE.description}`,
     '',
     '## Main sections',
-    '- /guides — Educational guides',
+    '- /guides — Educational guides and articles',
     '- /templates — Checklists and templates',
     '- /tools — Calculators and readiness checks',
     '- /glossary — Term definitions',

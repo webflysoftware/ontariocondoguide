@@ -5,6 +5,7 @@ import {
   definedTermSchema,
 } from '~/utils/schema';
 import type {
+  FormPagePayload,
   GlossaryPagePayload,
   GuidePagePayload,
   TemplatePagePayload,
@@ -118,6 +119,41 @@ export async function useToolPage(slug: string) {
     breadcrumbs: tool.breadcrumbs,
     relatedGuideLinks: tool.relatedGuideLinks,
     relatedTemplateLinks: tool.relatedTemplateLinks,
+  };
+}
+
+export async function useFormPage(slug: string) {
+  const nuxtApp = useNuxtApp();
+  const { data, error } = await useAsyncData(`form-${slug}`, () =>
+    $fetch<FormPagePayload>(`/api/forms/${slug}`),
+  );
+
+  if (error.value || !data.value) {
+    throw createError({ statusCode: 404, statusMessage: 'Form not found' });
+  }
+
+  const form = data.value;
+
+  nuxtApp.runWithContext(() => {
+    usePageSeo({
+      title: form.frontmatter.title,
+      description: form.frontmatter.summary,
+      path: form.path,
+      pageType: 'WebApplication',
+      breadcrumbs: form.breadcrumbs,
+      schema: webApplicationSchema({
+        title: form.frontmatter.title,
+        description: form.frontmatter.summary,
+        path: form.path,
+      }),
+    });
+  });
+
+  return {
+    form,
+    breadcrumbs: form.breadcrumbs,
+    relatedGuideLinks: form.relatedGuideLinks,
+    relatedTemplateLinks: form.relatedTemplateLinks,
   };
 }
 

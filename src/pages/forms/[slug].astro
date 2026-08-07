@@ -1,0 +1,104 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import DisclaimerBox from '../../components/DisclaimerBox.astro';
+import RelatedContent from '../../components/RelatedContent.astro';
+import FormFiller from '../../components/forms/FormFiller.astro';
+import {
+  contentPath,
+  getPublishedGuides,
+  getPublishedTemplates,
+  resolveRelatedLinks,
+  slugFromEntry,
+} from '../../lib/content';
+import { getFormSchema } from '@forms';
+import { articleSchema, breadcrumbSchema, type BreadcrumbItem } from '../../lib/schema';
+
+export async function getStaticPaths() {
+  const forms = await getCollection('forms');
+  return forms.map((entry) => ({
+    params: { slug: slugFromEntry(entry) },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const slug = slugFromEntry(entry);
+const path = contentPath('forms', slug);
+
+const schema = getFormSchema(slug);
+if (!schema) {
+  throw new Error(`No form schema registered for "${slug}". Add it to shared/condo-forms.`);
+}
+
+const [allGuides, allTemplates] = await Promise.all([
+  getPublishedGuides(),
+  getPublishedTemplates(),
+]);
+
+const guideIndex = allGuides.map((g) => ({
+  slug: slugFromEntry(g),
+  title: g.data.title,
+  href: contentPath('guides', slugFromEntry(g)),
+}));
+
+const templateIndex = allTemplates.map((t) => ({
+  slug: slugFromEntry(t),
+  title: t.data.title,
+  href: contentPath('templates', slugFromEntry(t)),
+}));
+
+const title = entry.data.metaTitle ?? entry.data.title;
+const description = entry.data.metaDescription ?? entry.data.summary;
+
+const breadcrumbs: BreadcrumbItem[] = [
+  { name: 'Home', path: '/' },
+  { name: 'Forms', path: '/forms' },
+  { name: entry.data.title, path },
+];
+
+const pageSchema = [articleSchema({ title, description, path }), breadcrumbSchema(breadcrumbs)];
+
+const officialPdfUrl = `/forms/${schema.officialPdf}`;
+const fillUrl = `/api/forms/${slug}/fill`;
+---
+
+<BaseLayout title={title} description={description} path={path} ogType="article" schema={pageSchema}>
+  <article class="mx-auto max-w-3xl px-4 py-10 sm:px-6" data-pagefind-body>
+    <Breadcrumbs items={breadcrumbs.map((item) => ({ label: item.name, href: item.path }))} />
+    <p class="text-sm font-medium text-brand-700">{entry.data.category}</p>
+    <h1 class="mt-2 text-3xl font-bold sm:text-4xl">{entry.data.title}</h1>
+    <p class="mt-4 text-lg leading-8 text-slate-700">{entry.data.summary}</p>
+
+    <div class="prose mt-8 max-w-none">
+      <Content />
+    </div>
+
+    <section class="mt-10" aria-labelledby="fill-heading">
+      <h2 id="fill-heading" class="text-2xl font-bold">Fill it out</h2>
+      <p class="mt-2 text-sm leading-6 text-slate-600">
+        Complete the fields below. Nothing is submitted until you choose to download the PDF.
+      </p>
+      <div class="mt-6">
+        <FormFiller
+          slug={slug}
+          fillUrl={fillUrl}
+          officialPdfUrl={officialPdfUrl}
+          officialSourceUrl={schema.officialSourceUrl}
+        />
+      </div>
+    </section>
+
+    <RelatedContent
+      title="Related guides"
+      items={resolveRelatedLinks(entry.data.relatedGuides, guideIndex)}
+    />
+    <RelatedContent
+      title="Related templates"
+      items={resolveRelatedLinks(entry.data.relatedTemplates, templateIndex)}
+    />
+    <DisclaimerBox />
+  </article>
+</BaseLayout>

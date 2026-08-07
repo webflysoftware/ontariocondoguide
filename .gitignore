@@ -1,5 +1,7 @@
 # build output
 dist/
+# bundled standalone API server (built by `npm run build:api`)
+server-dist/
 # generated types
 .astro/
 

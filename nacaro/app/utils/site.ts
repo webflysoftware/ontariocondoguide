@@ -17,6 +17,7 @@ export const CATEGORIES = [
   'Owner Resources',
   'Templates & Tools',
   'State Law & Compliance',
+  'Ontario Condo Forms',
 ] as const;
 
 export type Category = (typeof CATEGORIES)[number];
@@ -60,10 +61,17 @@ export const CATEGORY_META: Record<
     description: 'State-specific HOA and condo statutes, disclosure rules, and compliance basics.',
     indexPath: '/guides#state-law-compliance',
   },
+  'Ontario Condo Forms': {
+    slug: 'ontario-condo-forms',
+    description:
+      'Mandatory Ontario condominium forms under the Condominium Act, 1998 — downloadable and fillable online with guidance.',
+    indexPath: '/forms',
+  },
 };
 
 export const NAV_LINKS = [
   { href: '/guides', label: 'Guides' },
+  { href: '/forms', label: 'Forms' },
   { href: '/templates', label: 'Templates' },
   { href: '/tools', label: 'Tools' },
   { href: '/glossary', label: 'Glossary' },

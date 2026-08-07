@@ -102,6 +102,13 @@ export async function useToolsCatalog() {
   return { tools };
 }
 
+export async function useFormsCatalog() {
+  const { data } = await useAsyncData('forms-catalog', () => $fetch<ContentIndexResponse>('/forms.json'));
+  const forms = computed(() => data.value?.items ?? []);
+
+  return { forms };
+}
+
 export async function useGlossaryCatalog() {
   const { data } = await useAsyncData('glossary-catalog', () =>
     $fetch<GlossaryIndexResponse>('/glossary.json'),

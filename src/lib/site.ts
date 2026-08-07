@@ -15,6 +15,7 @@ export const CATEGORIES = [
   'Board Governance',
   'Owner Resources',
   'Templates & Tools',
+  'Ontario Condo Forms',
   'Digital Voting',
 ] as const;
 
@@ -54,6 +55,12 @@ export const CATEGORY_META: Record<
     description: 'Checklists, agenda templates, and planning tools.',
     indexPath: '/templates',
   },
+  'Ontario Condo Forms': {
+    slug: 'ontario-condo-forms',
+    description:
+      'Mandatory Ontario condo forms with guided pre-fill and downloadable, completed PDFs.',
+    indexPath: '/forms',
+  },
   'Digital Voting': {
     slug: 'digital-voting',
     description: 'Electronic voting, virtual meetings, and digital participation.',
@@ -62,7 +69,8 @@ export const CATEGORY_META: Record<
 };
 
 export const NAV_LINKS = [
-  { href: '/guides', label: 'Guides' },
+  { href: '/guides', label: 'Guides & Articles' },
+  { href: '/forms', label: 'Forms' },
   { href: '/templates', label: 'Templates' },
   { href: '/tools', label: 'Tools' },
   { href: '/glossary', label: 'Glossary' },

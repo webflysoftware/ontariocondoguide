@@ -35,3 +35,8 @@ export interface GlossaryFrontmatter extends BaseFrontmatter {
   definition: string;
   relatedGuides?: string[];
 }
+
+export interface FormFrontmatter extends BaseFrontmatter {
+  relatedGuides?: string[];
+  relatedTemplates?: string[];
+}

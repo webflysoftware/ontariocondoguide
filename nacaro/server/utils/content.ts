@@ -7,7 +7,7 @@ import type { FaqItem, IndexListItem } from '../../app/utils/schema';
 
 const md = new MarkdownIt({ html: false, linkify: true, typographer: true });
 
-export type ContentType = 'guides' | 'templates' | 'tools' | 'glossary';
+export type ContentType = 'guides' | 'templates' | 'tools' | 'glossary' | 'forms';
 
 interface BaseFrontmatter {
   title: string;
@@ -44,6 +44,11 @@ export interface GlossaryFrontmatter extends BaseFrontmatter {
   relatedGuides?: string[];
 }
 
+export interface FormFrontmatter extends BaseFrontmatter {
+  relatedGuides?: string[];
+  relatedTemplates?: string[];
+}
+
 export interface ContentEntry<T> {
   slug: string;
   path: string;
@@ -65,7 +70,7 @@ function resolveContentRoot(): string {
   throw new Error('Content directory not found.');
 }
 
-const CONTENT_ROOT = resolveContentRoot();
+export const CONTENT_ROOT = resolveContentRoot();
 
 function slugFromPath(filePath: string): string {
   const match = filePath.match(/\/([^/]+)\.md$/);
@@ -103,6 +108,7 @@ const guidesCache = loadCollection<GuideFrontmatter>('guides');
 const templatesCache = loadCollection<TemplateFrontmatter>('templates');
 const toolsCache = loadCollection<ToolFrontmatter>('tools');
 const glossaryCache = loadCollection<GlossaryFrontmatter>('glossary');
+const formsCache = loadCollection<FormFrontmatter>('forms');
 
 export function getAllGuides() { return guidesCache; }
 export function getGuide(slug: string) { return getBySlug(guidesCache, slug); }
@@ -113,6 +119,8 @@ export function getAllTools() { return toolsCache; }
 export function getTool(slug: string) { return getBySlug(toolsCache, slug); }
 export function getAllGlossaryTerms() { return glossaryCache; }
 export function getGlossaryTerm(slug: string) { return getBySlug(glossaryCache, slug); }
+export function getAllForms() { return formsCache; }
+export function getForm(slug: string) { return getBySlug(formsCache, slug); }
 
 export function resolveRelatedLinks(type: ContentType, slugs: string[] | undefined) {
   if (!slugs?.length) return [];
@@ -139,7 +147,16 @@ export function toIndexItem(type: ContentType, entry: ContentEntry<BaseFrontmatt
     summary: type === 'glossary' ? glossaryEntry.definition : entry.frontmatter.summary,
     href: entry.path,
     category: entry.frontmatter.category,
-    type: type === 'guides' ? 'guide' : type === 'templates' ? 'template' : type === 'tools' ? 'tool' : 'glossary',
+    type:
+      type === 'guides'
+        ? 'guide'
+        : type === 'templates'
+          ? 'template'
+          : type === 'tools'
+            ? 'tool'
+            : type === 'forms'
+              ? 'form'
+              : 'glossary',
     featured: type === 'guides' ? guideEntry.featured : undefined,
     lastUpdated: entry.frontmatter.lastUpdated,
   };
@@ -148,6 +165,7 @@ export function toIndexItem(type: ContentType, entry: ContentEntry<BaseFrontmatt
 export function getGuideIndex() { return { items: getAllGuides().map((e) => toIndexItem('guides', e)) }; }
 export function getTemplateIndex() { return { items: getAllTemplates().map((e) => toIndexItem('templates', e)) }; }
 export function getToolIndex() { return { items: getAllTools().map((e) => toIndexItem('tools', e)) }; }
+export function getFormIndex() { return { items: getAllForms().map((e) => toIndexItem('forms', e)) }; }
 export function getGlossaryIndex() {
   return { items: getAllGlossaryTerms().map((e) => ({ term: e.frontmatter.term, definition: e.frontmatter.definition, href: e.path, category: e.frontmatter.category })) };
 }
@@ -155,7 +173,7 @@ export function getAllIndexItems(): IndexListItem[] {
   return [...getGuideIndex().items, ...getTemplateIndex().items, ...getToolIndex().items, ...getGlossaryIndex().items.map((item) => ({ title: item.term, summary: item.definition, href: item.href, category: item.category, type: 'glossary' as const }))];
 }
 export function getAllContentPaths(): string[] {
-  return ['/', '/guides', '/templates', '/tools', '/glossary', '/about', '/contact', '/disclaimer', '/privacy', ...getAllGuides().map((g) => g.path), ...getAllTemplates().map((t) => t.path), ...getAllTools().map((t) => t.path), ...getAllGlossaryTerms().map((t) => t.path)];
+  return ['/', '/guides', '/forms', '/templates', '/tools', '/glossary', '/about', '/contact', '/disclaimer', '/privacy', ...getAllGuides().map((g) => g.path), ...getAllForms().map((f) => f.path), ...getAllTemplates().map((t) => t.path), ...getAllTools().map((t) => t.path), ...getAllGlossaryTerms().map((t) => t.path)];
 }
 export function groupByCategory<T extends BaseFrontmatter>(entries: ContentEntry<T>[]) {
   return entries.reduce<Record<string, ContentEntry<T>[]>>((acc, entry) => {
@@ -166,15 +184,16 @@ export function groupByCategory<T extends BaseFrontmatter>(entries: ContentEntry
 
 export function buildLlmsTxt(site: { name: string; fullName: string; description: string }, categories: readonly string[], categoryMeta: Record<string, { description: string }>) {
   const guides = getGuideIndex().items;
+  const forms = getFormIndex().items;
   const templates = getTemplateIndex().items;
   const tools = getToolIndex().items;
   const glossary = getGlossaryIndex().items;
-  return [`# ${site.name}`, '', `> ${site.fullName}`, '', `> ${site.description}`, '', '## Guides', ...guides.map((i) => `- [${i.title}](${i.href}): ${i.summary}`), '', '## Templates', ...templates.map((i) => `- [${i.title}](${i.href}): ${i.summary}`), '', '## Tools', ...tools.map((i) => `- [${i.title}](${i.href}): ${i.summary}`), '', '## Glossary', ...glossary.map((i) => `- [${i.term}](${i.href}): ${i.definition}`)].join('\n');
+  return [`# ${site.name}`, '', `> ${site.fullName}`, '', `> ${site.description}`, '', '## Guides', ...guides.map((i) => `- [${i.title}](${i.href}): ${i.summary}`), '', '## Forms', ...forms.map((i) => `- [${i.title}](${i.href}): ${i.summary}`), '', '## Templates', ...templates.map((i) => `- [${i.title}](${i.href}): ${i.summary}`), '', '## Tools', ...tools.map((i) => `- [${i.title}](${i.href}): ${i.summary}`), '', '## Glossary', ...glossary.map((i) => `- [${i.term}](${i.href}): ${i.definition}`)].join('\n');
 }
 
 export function buildLlmsFullTxt(site: { name: string; fullName: string; description: string; disclaimer: string }, categories: readonly string[]) {
   const lines = [`# ${site.name} — Full content index`, '', site.description, '', '## Categories', ...categories.map((c) => `- ${c}`), ''];
-  for (const section of [{ title: 'Guides', items: getGuideIndex().items }, { title: 'Templates', items: getTemplateIndex().items }, { title: 'Tools', items: getToolIndex().items }]) {
+  for (const section of [{ title: 'Guides', items: getGuideIndex().items }, { title: 'Forms', items: getFormIndex().items }, { title: 'Templates', items: getTemplateIndex().items }, { title: 'Tools', items: getToolIndex().items }]) {
     lines.push(`## ${section.title}`, '', ...section.items.map((i) => `- [${i.title}](${i.href}): ${i.summary}`), '');
   }
   lines.push('## Legal notice', site.disclaimer);

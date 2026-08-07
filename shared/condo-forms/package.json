@@ -1,0 +1,22 @@
+{
+  "name": "condo-forms",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Framework-agnostic core for Ontario condo forms: schemas, validation, and PDF generation. Shared by the Astro (ontariocondoguide.ca) and Nuxt (nacaro) apps.",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    },
+    "./pdf": {
+      "types": "./pdf.d.ts",
+      "default": "./pdf.js"
+    }
+  },
+  "peerDependencies": {
+    "pdf-lib": "^1.17.1"
+  }
+}

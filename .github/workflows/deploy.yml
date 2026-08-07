@@ -47,6 +47,9 @@ jobs:
       - name: Build static site
         run: npm run build
 
+      - name: Build standalone API server
+        run: npm run build:api
+
       - name: Configure SSH
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
@@ -81,10 +84,12 @@ jobs:
         run: |
           set -euo pipefail
           PORT="${SSH_PORT:-22}"
-          rsync -avz \
+          # server-dist/ contains a single self-contained bundle (index.mjs) with
+          # pdf-lib and the shared condo-forms core inlined — no node_modules needed.
+          rsync -avz --delete \
             --chmod=D755,F644 \
             -e "ssh -i ~/.ssh/deploy_key -p ${PORT} -o StrictHostKeyChecking=yes" \
-            server/ \
+            server-dist/ \
             "${SSH_USER}@${SSH_HOST}:/var/www/ontariocondoguide-api/"
 
       - name: Upload nginx config and run server deploy script

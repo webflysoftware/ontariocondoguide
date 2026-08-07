@@ -1,5 +1,11 @@
 {
   "extends": "astro/tsconfigs/strict",
   "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist"]
+  "exclude": ["dist"],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@forms": ["./shared/condo-forms/index.js"]
+    }
+  }
 }

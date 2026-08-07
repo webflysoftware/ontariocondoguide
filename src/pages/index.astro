@@ -12,6 +12,7 @@ import { SITE, CATEGORIES, CATEGORY_META } from '../lib/site';
 import { resolveCoverImage } from '../lib/coverImages';
 import {
   contentPath,
+  filterByKind,
   getPublishedGuides,
   getPublishedTemplates,
   getPublishedTools,
@@ -19,12 +20,15 @@ import {
   slugFromEntry,
 } from '../lib/content';
 
-const guides = await getPublishedGuides();
+const entries = await getPublishedGuides();
+const guides = filterByKind(entries, 'guide');
+const articles = filterByKind(entries, 'article');
 const templates = await getPublishedTemplates();
 const tools = await getPublishedTools();
 const glossary = await getPublishedGlossary();
 
-const spotlightGuide = guides.find((guide) => guide.data.featured);
+const spotlightGuide =
+  entries.find((entry) => entry.data.featured) ?? guides[0];
 const spotlightSlug = spotlightGuide ? slugFromEntry(spotlightGuide) : undefined;
 const spotlightImage = spotlightGuide ? resolveCoverImage(spotlightGuide.data.coverImage) : undefined;
 
@@ -46,8 +50,8 @@ const pillars = [
     href: '/guides/bill-72-condo-act-changes-explained',
     guides: [
       { label: 'Bill 72 Condo Act Changes', href: '/guides/bill-72-condo-act-changes-explained' },
+      { label: 'Meeting & Voting Changes 2026–2027', href: '/guides/cao-meeting-voting-changes-2026' },
       { label: 'CAO Annual Return Filing (2026)', href: '/guides/cao-annual-return-filing-2026' },
-      { label: 'Reserve Fund Reforms Update', href: '/guides/ontario-condo-reserve-fund-reforms-2026' },
     ],
   },
   {
@@ -95,6 +99,10 @@ const pillars = [
         <span class="ml-2 text-slate-600">guides</span>
       </div>
       <div>
+        <span class="text-2xl font-bold text-brand-800">{articles.length}</span>
+        <span class="ml-2 text-slate-600">articles</span>
+      </div>
+      <div>
         <span class="text-2xl font-bold text-brand-800">{templates.length}</span>
         <span class="ml-2 text-slate-600">templates</span>
       </div>
@@ -117,6 +125,7 @@ const pillars = [
           category={spotlightGuide.data.category}
           image={spotlightImage}
           imageAlt={spotlightGuide.data.coverImageAlt ?? spotlightGuide.data.title}
+          kind={spotlightGuide.data.kind}
         />
       )
     }

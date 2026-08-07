@@ -4,42 +4,79 @@ import ArticleCard from '../../components/ArticleCard.astro';
 import { CATEGORY_META, type Category } from '../../lib/site';
 import {
   contentPath,
+  filterByKind,
   getPublishedGuides,
   groupByCategory,
   slugFromEntry,
+  sortByLastUpdatedDesc,
 } from '../../lib/content';
 
-const guides = await getPublishedGuides();
+const entries = await getPublishedGuides();
+const guides = filterByKind(entries, 'guide');
+const articles = sortByLastUpdatedDesc(filterByKind(entries, 'article'));
 const grouped = groupByCategory(guides);
 ---
 
 <LandingPageLayout
-  title="Guides"
-  description="Educational guides on Ontario condo governance, AGMs, elections, proxies, and quorum."
+  title="Guides & Articles"
+  description="Educational guides and articles on Ontario condo governance, AGMs, elections, proxies, and quorum."
   path="/guides"
-  heading="Guides"
+  heading="Guides & Articles"
 >
   <p class="max-w-2xl text-lg leading-8 text-slate-700">
-    Practical overviews to help boards, owners, and managers understand common Ontario condo
-    governance processes.
+    Practical overviews and timely explainers to help boards, owners, and managers understand
+    Ontario condo governance — from step-by-step guides to legislation and industry news.
   </p>
 
   {
-    Object.entries(grouped).map(([category, entries]) => (
-      <section class="mt-10 scroll-mt-24" id={CATEGORY_META[category as Category]?.slug ?? category}>
-        <h2 class="text-xl font-semibold">{category}</h2>
+    articles.length > 0 && (
+      <section class="mt-10 scroll-mt-24" id="articles">
+        <h2 class="text-xl font-semibold">Articles</h2>
+        <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+          Explainers and updates on legislation, CAO announcements, and other developments that
+          affect Ontario condo voting and governance.
+        </p>
         <div class="mt-4 grid gap-4 sm:grid-cols-2">
-          {entries.map((guide) => (
+          {articles.map((article) => (
             <ArticleCard
-              title={guide.data.title}
-              href={contentPath('guides', slugFromEntry(guide))}
-              summary={guide.data.summary}
-              category={guide.data.category}
-              meta={`Updated ${guide.data.lastUpdated.toLocaleDateString('en-CA')}`}
+              title={article.data.title}
+              href={contentPath('guides', slugFromEntry(article))}
+              summary={article.data.summary}
+              category="Article"
+              meta={`${article.data.category} · Updated ${article.data.lastUpdated.toLocaleDateString('en-CA')}`}
             />
           ))}
         </div>
       </section>
-    ))
+    )
   }
+
+  <section class="mt-12 scroll-mt-24" id="guides">
+    <h2 class="text-xl font-semibold">Guides</h2>
+    <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+      How-to resources for meetings, elections, proxies, quorum, and day-to-day board processes.
+    </p>
+
+    {
+      Object.entries(grouped).map(([category, categoryEntries]) => (
+        <section
+          class="mt-8 scroll-mt-24"
+          id={CATEGORY_META[category as Category]?.slug ?? category}
+        >
+          <h3 class="text-lg font-semibold text-slate-800">{category}</h3>
+          <div class="mt-4 grid gap-4 sm:grid-cols-2">
+            {categoryEntries.map((guide) => (
+              <ArticleCard
+                title={guide.data.title}
+                href={contentPath('guides', slugFromEntry(guide))}
+                summary={guide.data.summary}
+                category={guide.data.category}
+                meta={`Updated ${guide.data.lastUpdated.toLocaleDateString('en-CA')}`}
+              />
+            ))}
+          </div>
+        </section>
+      ))
+    }
+  </section>
 </LandingPageLayout>

@@ -29,6 +29,7 @@ const guides = defineCollection({
     disclaimerType: z.enum(['general', 'legal']).default('general'),
     faqs: z.array(faqSchema).default([]),
     featured: z.boolean().default(false),
+    kind: z.enum(['guide', 'article']).default('guide'),
     coverImage: z.string().optional(),
     coverImageAlt: z.string().optional(),
   }),
@@ -81,4 +82,19 @@ const tools = defineCollection({
   }),
 });
 
-export const collections = { guides, templates, glossary, tools };
+const forms = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/forms' }),
+  schema: z.object({
+    title: z.string(),
+    slug: z.string().optional(),
+    summary: z.string(),
+    category: categorySchema,
+    metaTitle: z.string().optional(),
+    metaDescription: z.string().optional(),
+    lastUpdated: z.coerce.date(),
+    relatedGuides: z.array(z.string()).default([]),
+    relatedTemplates: z.array(z.string()).default([]),
+  }),
+});
+
+export const collections = { guides, templates, glossary, tools, forms };

@@ -6,15 +6,36 @@ export function slugFromEntry(entry: { id: string; data: { slug?: string } }): s
 }
 
 export function contentPath(
-  type: 'guides' | 'templates' | 'tools' | 'glossary',
+  type: 'guides' | 'templates' | 'tools' | 'glossary' | 'forms',
   slug: string,
 ): string {
   return `/${type}/${slug}`;
 }
 
+export type GuideEntry = CollectionEntry<'guides'>;
+export type TemplateEntry = CollectionEntry<'templates'>;
+export type ToolEntry = CollectionEntry<'tools'>;
+export type GlossaryEntry = CollectionEntry<'glossary'>;
+export type FormEntry = CollectionEntry<'forms'>;
+export type GuideKind = 'guide' | 'article';
+
 export async function getPublishedGuides() {
   return (await getCollection('guides')).sort((a, b) =>
     a.data.title.localeCompare(b.data.title),
+  );
+}
+
+export function isArticle(entry: GuideEntry): boolean {
+  return entry.data.kind === 'article';
+}
+
+export function filterByKind(entries: GuideEntry[], kind: GuideKind): GuideEntry[] {
+  return entries.filter((entry) => entry.data.kind === kind);
+}
+
+export function sortByLastUpdatedDesc(entries: GuideEntry[]): GuideEntry[] {
+  return [...entries].sort(
+    (a, b) => b.data.lastUpdated.getTime() - a.data.lastUpdated.getTime(),
   );
 }
 
@@ -36,6 +57,12 @@ export async function getPublishedGlossary() {
   );
 }
 
+export async function getPublishedForms() {
+  return (await getCollection('forms')).sort((a, b) =>
+    a.data.title.localeCompare(b.data.title),
+  );
+}
+
 export function groupByCategory<T extends { data: { category: Category } }>(entries: T[]) {
   return CATEGORIES.reduce<Record<string, T[]>>((acc, category) => {
     const items = entries.filter((entry) => entry.data.category === category);
@@ -44,11 +71,6 @@ export function groupByCategory<T extends { data: { category: Category } }>(entr
   }, {});
 }
 
-export type GuideEntry = CollectionEntry<'guides'>;
-export type TemplateEntry = CollectionEntry<'templates'>;
-export type ToolEntry = CollectionEntry<'tools'>;
-export type GlossaryEntry = CollectionEntry<'glossary'>;
-
 export interface ContentIndexItem {
   title: string;
   url: string;
@@ -56,6 +78,7 @@ export interface ContentIndexItem {
   category: Category;
   lastUpdated?: string;
   primaryKeyword?: string;
+  kind?: GuideKind;
 }
 
 export function resolveRelatedLinks(
@@ -85,6 +108,7 @@ export function toIndexItem(
       ...base,
       lastUpdated: entry.data.lastUpdated.toISOString().split('T')[0],
       primaryKeyword: entry.data.primaryKeyword,
+      kind: entry.data.kind,
     };
   }
 

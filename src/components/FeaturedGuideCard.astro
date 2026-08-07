@@ -9,13 +9,15 @@ interface Props {
   category: string;
   image: ImageMetadata;
   imageAlt: string;
+  kind?: 'guide' | 'article';
 }
 
-const { title, href, summary, category, image, imageAlt } = Astro.props;
+const { title, href, summary, category, image, imageAlt, kind = 'guide' } = Astro.props;
+const label = kind === 'article' ? 'article' : 'guide';
 ---
 
 <article class="mt-10">
-  <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-700">Featured guide</p>
+  <p class="text-xs font-semibold uppercase tracking-[0.16em] text-brand-700">Featured {label}</p>
   <a
     href={href}
     class="group mt-3 grid overflow-hidden rounded-xl border border-border bg-white shadow-sm no-underline transition hover:border-brand-200 hover:shadow-md md:grid-cols-[minmax(0,11rem)_minmax(0,1fr)] lg:grid-cols-[minmax(0,16rem)_minmax(0,1fr)]"
@@ -44,7 +46,7 @@ const { title, href, summary, category, image, imageAlt } = Astro.props;
       <span
         class="mt-4 inline-flex items-center text-sm font-medium text-brand-700 group-hover:text-brand-800"
       >
-        Read guide
+        Read {label}
         <span aria-hidden="true" class="ml-1 transition group-hover:translate-x-0.5">→</span>
       </span>
     </div>

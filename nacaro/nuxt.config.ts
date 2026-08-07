@@ -37,6 +37,10 @@ export default defineNuxtConfig({
   },
   vite: {
     plugins: [tailwindcss()],
+    server: {
+      // Allow importing the repo-root shared/condo-forms package from the client.
+      fs: { allow: ['..'] },
+    },
   },
   runtimeConfig: {
     contactTo: process.env.NUXT_CONTACT_TO || '',
@@ -45,7 +49,7 @@ export default defineNuxtConfig({
   },
   nitro: {
     externals: {
-      inline: ['gray-matter', 'markdown-it'],
+      inline: ['gray-matter', 'markdown-it', 'pdf-lib'],
     },
     hooks: {
       compiled(nitro) {
