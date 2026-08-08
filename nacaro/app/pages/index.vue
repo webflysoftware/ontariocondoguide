@@ -50,6 +50,10 @@ usePageSeo({
         </div>
       </div>
 
+      <div class="mt-10">
+        <CamPulseFeature />
+      </div>
+
       <section class="mt-12">
         <h2 class="text-2xl font-semibold">Who we serve</h2>
         <p class="mt-2 max-w-2xl text-slate-600">

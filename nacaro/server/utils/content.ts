@@ -173,7 +173,7 @@ export function getAllIndexItems(): IndexListItem[] {
   return [...getGuideIndex().items, ...getTemplateIndex().items, ...getToolIndex().items, ...getGlossaryIndex().items.map((item) => ({ title: item.term, summary: item.definition, href: item.href, category: item.category, type: 'glossary' as const }))];
 }
 export function getAllContentPaths(): string[] {
-  return ['/', '/guides', '/forms', '/templates', '/tools', '/glossary', '/about', '/contact', '/disclaimer', '/privacy', ...getAllGuides().map((g) => g.path), ...getAllForms().map((f) => f.path), ...getAllTemplates().map((t) => t.path), ...getAllTools().map((t) => t.path), ...getAllGlossaryTerms().map((t) => t.path)];
+  return ['/', '/guides', '/forms', '/templates', '/tools', '/glossary', '/about', '/contact', '/disclaimer', '/privacy', '/cam-pulse-2026', ...getAllGuides().map((g) => g.path), ...getAllForms().map((f) => f.path), ...getAllTemplates().map((t) => t.path), ...getAllTools().map((t) => t.path), ...getAllGlossaryTerms().map((t) => t.path)];
 }
 export function groupByCategory<T extends BaseFrontmatter>(entries: ContentEntry<T>[]) {
   return entries.reduce<Record<string, ContentEntry<T>[]>>((acc, entry) => {
